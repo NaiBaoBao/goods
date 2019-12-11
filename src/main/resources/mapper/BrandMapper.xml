@@ -26,4 +26,8 @@
                is_deleted
                from brand where id=#{id} and is_deleted=0
     </select>
+    <insert id="addBrand" parameterType="com.example.goods.domain.Brand" useGeneratedKeys="true" keyProperty="id">
+        insert into brand (name,description,pic_url,gmt_create,gmt_modified,is_deleted)
+        values (#{name},#{description},#{picUrl},current_timestamp ,current_timestamp,0)
+    </insert>
 </mapper>

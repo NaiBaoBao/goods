@@ -49,4 +49,11 @@ public class GoodsServiceImpl implements GoodsService {
     public int deleteProductById(Integer id){return productMapper.deleteProductById(id);}
     @Override
     public Brand getBrandById(Integer id){return brandMapper.getBrandById(id);}
+    @Override
+    public int addGoods(Goods goods){return goodsMapper.addGoods(goods);}
+    @Override
+    public int addBrand(Brand brand){return brandMapper.addBrand(brand);}
+    @Override
+    public int addGoodsCategory(GoodsCategory goodsCategory){return goodsCategoryMapper.addGoodsCategory(goodsCategory);}
+
 }

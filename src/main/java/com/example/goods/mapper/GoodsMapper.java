@@ -11,4 +11,5 @@ public interface GoodsMapper {
     public Goods getGoodsById(Integer id);
     public List<Goods> getCategoriesInfoById(Integer id);
     public List<Goods> listGoods();
+    public int addGoods(Goods goods);
 }

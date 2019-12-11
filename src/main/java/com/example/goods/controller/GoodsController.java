@@ -1,6 +1,7 @@
 package com.example.goods.controller;
 
 import com.example.goods.domain.Brand;
+import com.example.goods.domain.Goods;
 import com.example.goods.domain.GoodsCategory;
 import com.example.goods.domain.Product;
 import com.example.goods.service.GoodsService;
@@ -34,7 +35,7 @@ public class GoodsController {
      * @param id
      * @return
      */
-    //通过！！！！！！！！！！！！！！
+    //通过！！！！！！！！！！！！！！!!!!!!!!删掉了body的注解！！！！！～～～
     @PostMapping("/goods/{id}/products")
     public Object insertProductByGoodsId(@PathVariable Integer id,Product product) {
         product.setGoodsId(id);
@@ -52,29 +53,30 @@ public class GoodsController {
 //        return null;
 //    }
 //
-//    /**
-//     * 管理员删除商品下的某个产品信息
-//     *
-//     * @param id
-//     * @return
-//     */
+    /**
+     * 管理员删除商品下的某个产品信息
+     *
+     * @param id
+     * @return
+     */
     //通过！！！！！
     @DeleteMapping("/products/{id}")
     public Object deleteProductById(@PathVariable Integer id) {
         return goodsService.deleteProductById(id);
     }
-//
-//    /**
-//     * 新建商品
-//     *
-//     * @param goodsAllinone
-//     * @return
-//     */
-//    @PostMapping("/goods")
-//    public Object addGoods(@RequestBody Goods goods) {
-//        return null;
-//    }
-//
+
+    /**
+     * 新建商品
+     *
+     * @param goods
+     * @return
+     */
+    //通过！！！！！！！！！！！！！！!!!!!!!!删掉了body的注解！！！！！～～～
+    @PostMapping("/goods")
+    public Object addGoods( Goods goods) {
+        return goodsService.addGoods(goods);
+    }
+
     /**
      * 根据id获取某个商品
      *
@@ -161,25 +163,26 @@ public class GoodsController {
                                        @RequestParam String order) {
         return goodsService.listBrandByCondition();
     }
-//
-//
-//    /**
-//     * 创建一个品牌
-//     *
-//     * @param brand
-//     * @return
-//     */
-//    @PostMapping("/brands")
-//    public Object addBrand(@RequestBody Brand brand) {
-//        return null;
-//    }
-//
-//    /**
-//     * 查看品牌详情,此API与商城端/brands/{id}完全相同
-//     *
-//     * @param id
-//     * @return
-//     */
+
+
+    /**
+     * 创建一个品牌
+     *
+     * @param brand
+     * @return
+     */
+    //通过！！！！！！！！！！！！！！!!!!!!!!删掉了body的注解！！！！！～～～
+    @PostMapping("/brands")
+    public Object addBrand(Brand brand) {
+        return goodsService.addBrand(brand);
+    }
+
+    /**
+     * 查看品牌详情,此API与商城端/brands/{id}完全相同
+     *
+     * @param id
+     * @return
+     */
     //通过！！！！
     @GetMapping("/brands/{id}")
     public Object getBrandById(@PathVariable Integer id) {
@@ -220,18 +223,19 @@ public class GoodsController {
     public Object listGoodsCategory() {
         return goodsService.listGoodsCategory();
     }
-//
-//    /**
-//     * 新建一个分类
-//     *
-//     * @param goodsCategory
-//     * @return
-//     */
-//    @PostMapping("/categories")
-//    public Object addGoodsCategory(@RequestBody GoodsCategory goodsCategory) {
-//        return null;
-//    }
-//
+
+    /**
+     * 新建一个分类
+     *
+     * @param goodsCategory
+     * @return
+     */
+    //通过！！！！！！！！！！！！！！!!!!!!!!删掉了body的注解！！！！！～～～
+    @PostMapping("/categories")
+    public Object addGoodsCategory(GoodsCategory goodsCategory) {
+        return goodsService.addGoodsCategory(goodsCategory);
+    }
+
 //    /**
 //     * 查看单个分类信息
 //     *

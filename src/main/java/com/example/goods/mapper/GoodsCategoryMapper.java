@@ -7,4 +7,5 @@ import java.util.List;
 @Mapper
 public interface GoodsCategoryMapper {
     public List<GoodsCategory> listGoodsCategory();
+    public int addGoodsCategory(GoodsCategory goodsCategory);
 }

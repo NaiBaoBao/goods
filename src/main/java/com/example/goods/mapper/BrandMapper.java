@@ -10,4 +10,5 @@ public interface BrandMapper {
     public int deleteBrandById(Integer id);
     public List<Brand> listBrandByCondition();
     public Brand getBrandById(Integer id);
+    public int addBrand(Brand brand);
 }

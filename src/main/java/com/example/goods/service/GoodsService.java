@@ -22,4 +22,7 @@ public interface GoodsService {
     int insertProductByGoodsId(Product product);
     int deleteProductById(Integer id);
     Brand getBrandById(Integer id);
+    int addGoods(Goods goods);
+    int addBrand(Brand brand);
+    int addGoodsCategory(GoodsCategory goodsCategory);
 }

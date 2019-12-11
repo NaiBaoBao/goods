@@ -37,7 +37,7 @@ public class Goods {
     /**
      * 0：上架 1：下架 2: 最新  （具体看数据字典）
      */
-    private Integer statusCode;
+    private Integer status;
     /**
      * 分享链接
      */
@@ -90,7 +90,7 @@ public class Goods {
                 ", brief='" + brief + '\'' +
                 ", picUrl='" + picUrl + '\'' +
                 ", detail='" + detail + '\'' +
-                ", statusCode=" + statusCode +
+                ", status=" + status +
                 ", shareUrl='" + shareUrl + '\'' +
                 ", gallery='" + gallery + '\'' +
                 ", goodsCategoryId=" + goodsCategoryId +
@@ -199,12 +199,12 @@ public class Goods {
         this.detail = detail;
     }
 
-    public Integer getStatusCode() {
-        return statusCode;
+    public Integer getStatus() {
+        return status;
     }
 
-    public void setStatusCode(Integer statusCode) {
-        this.statusCode = statusCode;
+    public void setStatus(Integer statusCode) {
+        this.status = status;
     }
 
     public String getShareUrl() {

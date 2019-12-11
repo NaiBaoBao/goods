@@ -11,5 +11,9 @@
                pic_url
                from goods_category where is_deleted=0
     </select>
+    <insert id="addGoodsCategory" parameterType="com.example.goods.domain.GoodsCategory" useGeneratedKeys="true" keyProperty="id">
+        insert into goods_category (name,pid,gmt_create,gmt_modified,is_deleted,pic_url)
+        values (#{name},#{pid},current_timestamp,current_timestamp,0,#{picUrl})
+    </insert>
 
 </mapper>

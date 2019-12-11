@@ -17,12 +17,16 @@ public interface GoodsService {
     List<GoodsCategory> listGoodsCategory();
     Goods getGoodsById(Integer id);
     List<Goods> getCategoriesInfoById(Integer id);
-    List<Goods> listGoods();
-    List<Brand> listBrandByCondition();
-    int insertProductByGoodsId(Product product);
+    List<Goods> listGoods(String goodsSn,String name);
+    List<Brand> listBrandByCondition(Integer id,String name);
+    int addProductByGoodsId(Product product);
     int deleteProductById(Integer id);
     Brand getBrandById(Integer id);
     int addGoods(Goods goods);
     int addBrand(Brand brand);
     int addGoodsCategory(GoodsCategory goodsCategory);
+    GoodsCategory getGoodsCategoryById(Integer id);
+    Product getProductById(Integer id);
+    List<Brand> listBrand();
+    int updateProductById(Product product);
 }

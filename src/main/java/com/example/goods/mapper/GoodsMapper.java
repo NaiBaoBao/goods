@@ -10,6 +10,6 @@ import java.util.List;
 public interface GoodsMapper {
     public Goods getGoodsById(Integer id);
     public List<Goods> getCategoriesInfoById(Integer id);
-    public List<Goods> listGoods();
+    public List<Goods> listGoods(String goodsSn,String name);
     public int addGoods(Goods goods);
 }

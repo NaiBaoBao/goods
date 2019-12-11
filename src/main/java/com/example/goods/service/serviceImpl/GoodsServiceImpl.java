@@ -40,11 +40,11 @@ public class GoodsServiceImpl implements GoodsService {
     @Override
     public List<Goods> getCategoriesInfoById(Integer id){return goodsMapper.getCategoriesInfoById(id);}
     @Override
-    public List<Goods> listGoods(){return goodsMapper.listGoods();}
+    public List<Goods> listGoods(String goodsSn,String name){return goodsMapper.listGoods(goodsSn,name);}
     @Override
-    public List<Brand> listBrandByCondition(){return brandMapper.listBrandByCondition();}
+    public List<Brand> listBrandByCondition(Integer id,String name){return brandMapper.listBrandByCondition(id,name);}
     @Override
-    public int insertProductByGoodsId(Product product){return productMapper.insertProductByGoodsId(product);}
+    public int addProductByGoodsId(Product product){return productMapper.addProductByGoodsId(product);}
     @Override
     public int deleteProductById(Integer id){return productMapper.deleteProductById(id);}
     @Override
@@ -55,5 +55,12 @@ public class GoodsServiceImpl implements GoodsService {
     public int addBrand(Brand brand){return brandMapper.addBrand(brand);}
     @Override
     public int addGoodsCategory(GoodsCategory goodsCategory){return goodsCategoryMapper.addGoodsCategory(goodsCategory);}
-
+    @Override
+    public GoodsCategory getGoodsCategoryById(Integer id){return goodsCategoryMapper.getGoodsCategoryById(id);}
+    @Override
+    public Product getProductById(Integer id){return productMapper.getProductById(id);}
+    @Override
+    public List<Brand> listBrand(){return brandMapper.listBrand();}
+    @Override
+    public int updateProductById(Product product){return productMapper.updateProductById(product);}
 }

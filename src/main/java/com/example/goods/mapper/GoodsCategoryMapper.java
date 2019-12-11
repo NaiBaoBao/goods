@@ -8,4 +8,6 @@ import java.util.List;
 public interface GoodsCategoryMapper {
     public List<GoodsCategory> listGoodsCategory();
     public int addGoodsCategory(GoodsCategory goodsCategory);
+    public GoodsCategory getGoodsCategoryById(Integer id);
+
 }

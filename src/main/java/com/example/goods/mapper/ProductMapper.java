@@ -7,6 +7,8 @@ import java.util.List;
 @Mapper
 public interface ProductMapper {
     public List<Product> listProductByGoodsId(Integer id);
-    public int insertProductByGoodsId(Product product);
+    public int addProductByGoodsId(Product product);
     public int deleteProductById(Integer id);
+    public Product getProductById(Integer id);
+    public int updateProductById(Product product);
 }

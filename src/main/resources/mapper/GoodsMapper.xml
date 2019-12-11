@@ -71,7 +71,15 @@
                 special_freight_id,
                 is_special,
                 price
-                from goods where is_deleted=0
+                from goods
+                where
+                <if test="goodsSn!=null">
+                        goods_sn=#{goodsSn} and
+                </if>
+                <if test="name!=null">
+                        name=#{name} and
+                </if>
+                is_deleted=0
     </select>
         <insert id="addGoods" parameterType="com.example.goods.domain.Goods" useGeneratedKeys="true" keyProperty="id">
                 insert into goods (gmt_create,gmt_modified,name,goods_sn,short_name,description,brief,pic_url,detail,status,share_url,gallery,goods_category_id,brand_id,is_deleted,weight,volume,special_freight_id,is_special,price)

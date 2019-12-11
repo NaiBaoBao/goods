@@ -15,5 +15,14 @@
         insert into goods_category (name,pid,gmt_create,gmt_modified,is_deleted,pic_url)
         values (#{name},#{pid},current_timestamp,current_timestamp,0,#{picUrl})
     </insert>
-
+    <select id="getGoodsCategoryById" parameterType="integer" resultType="com.example.goods.domain.GoodsCategory">
+        select id,
+               name,
+               pid,
+               gmt_create,
+               gmt_modified,
+               is_deleted,
+               pic_url
+               from goods_category where id=#{id} and is_deleted=0
+    </select>
 </mapper>

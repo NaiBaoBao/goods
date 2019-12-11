@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.goods.mapper.BrandMapper">
+    <update id="deleteBrandById" parameterType="integer">
+        update brand
+        set is_deleted=1
+        where id=#{id}
+    </update>
+    <select id="listBrandByCondition" resultType="com.example.goods.domain.Brand">
+        select id,
+        name,
+        description,
+        pic_url,
+        gmt_create,
+        gmt_modified,
+        is_deleted
+        from brand where is_deleted=0
+    </select>
+    <select id="getBrandById" parameterType="integer" resultType="com.example.goods.domain.Brand">
+        select id,
+               name,
+               description,
+               pic_url,
+               gmt_create,
+               gmt_modified,
+               is_deleted
+               from brand where id=#{id} and is_deleted=0
+    </select>
+</mapper>

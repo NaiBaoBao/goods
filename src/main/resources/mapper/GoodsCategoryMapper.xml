@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.example.goods.mapper.GoodsCategoryMapper">
-    <select id="listGoodsCategory" resultType="com.example.goods.domain.GoodsCategory">
+    <select id="listGoodsCategory" resultType="com.example.goods.domain.GoodsCategoryPo">
         select id,
                name,
                pid,
@@ -11,18 +11,57 @@
                pic_url
                from goods_category where is_deleted=0
     </select>
-    <insert id="addGoodsCategory" parameterType="com.example.goods.domain.GoodsCategory" useGeneratedKeys="true" keyProperty="id">
+    <insert id="addGoodsCategory" parameterType="com.example.goods.domain.GoodsCategoryPo" useGeneratedKeys="true" keyProperty="id">
         insert into goods_category (name,pid,gmt_create,gmt_modified,is_deleted,pic_url)
         values (#{name},#{pid},current_timestamp,current_timestamp,0,#{picUrl})
     </insert>
-    <select id="getGoodsCategoryById" parameterType="integer" resultType="com.example.goods.domain.GoodsCategory">
+    <select id="getGoodsCategoryById" parameterType="integer" resultType="com.example.goods.domain.GoodsCategoryPo">
         select id,
                name,
                pid,
                gmt_create,
                gmt_modified,
-               is_deleted,
                pic_url
                from goods_category where id=#{id} and is_deleted=0
+    </select>
+    <update id="updateGoodsCategoryById" parameterType="com.example.goods.domain.GoodsCategoryPo">
+        update goods_category
+        set name=#{name},
+            pid=#{pid},
+            gmt_modified=current_timestamp,
+            pic_url=#{picUrl}
+            where id=#{id}
+    </update>
+    <update id="deleteGoodsCategory" parameterType="integer">
+        update goods_category
+        set is_deleted=1
+        where id=#{id}
+    </update>
+    <select id="listOneLevelGoodsCategory" resultType="com.example.goods.domain.GoodsCategoryPo">
+        select id,
+               name,
+               pid,
+               gmt_create,
+               gmt_modified,
+               pic_url
+               from goods_category where pid is null and is_deleted=0
+    </select>
+    <select id="listSecondLevelGoodsCategoryById" parameterType="integer" resultType="com.example.goods.domain.GoodsCategoryPo">
+        select id,
+               name,
+               pid,
+               gmt_create,
+               gmt_modified,
+               pic_url
+               from goods_category where pid=#{id} and is_deleted=0
+    </select>
+    <update id="deleteSecondLevelCategory" parameterType="integer">
+        update goods_category
+        set is_deleted=1
+        where pid=#{id}
+    </update>
+    <select id="getSecondLevelId" parameterType="integer" resultType="integer">
+        select id
+               from goods_category where pid=#{id}
     </select>
 </mapper>

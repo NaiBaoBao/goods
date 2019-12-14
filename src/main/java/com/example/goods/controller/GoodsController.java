@@ -1,18 +1,12 @@
 package com.example.goods.controller;
 
-import com.example.goods.domain.Brand;
-import com.example.goods.domain.Goods;
-import com.example.goods.domain.GoodsCategory;
-import com.example.goods.domain.Product;
+import com.example.goods.domain.*;
 import com.example.goods.service.GoodsService;
+import com.example.goods.util.ResponseUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import org.apache.catalina.manager.util.SessionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
@@ -20,15 +14,16 @@ import java.util.List;
 public class GoodsController {
     @Autowired
     private GoodsService goodsService;
+
     /**
-     * 管理员查询商品下的产品
+     * 管理员查询商品下的产品，可看下架
      *
      * @param id
-     * @return
+     * @return List<ProductVo>，所属该商品的产品列表
      */
-    //通过!!!!!!!!!!!
+    //更改完毕！
     @GetMapping("/goods/{id}/products")
-    public Object listProductByGoodsId(@PathVariable(value = "id") Integer id) {
+    public List<ProductPo> listProductByGoodsId(@PathVariable(value = "id") Integer id) {
         return goodsService.listProductByGoodsId(id);
     }
 
@@ -36,14 +31,27 @@ public class GoodsController {
      * 管理员添加商品下的产品
      *
      * @param id
+     * @return Product
+     */
+    //删掉了body的注解！！更改完毕！
+    @PostMapping("/goods/{id}/products")
+    public ProductPo addProductByGoodsId(@PathVariable Integer id,ProductPo productVo) {
+        productVo.setGoodsId(id);
+        return goodsService.addProductByGoodsId(productVo);
+    }
+
+    /**
+     * 根据id获得产品对象
+     *
+     * @param id
      * @return
      */
-    //通过！！！！！！！！！！！！！！!!!!!!!!删掉了body的注解！！！！！～～～
-    @PostMapping("/goods/{id}/products")
-    public Object addProductByGoodsId(@PathVariable Integer id,Product product) {
-        product.setGoodsId(id);
-        return goodsService.addProductByGoodsId(product);
+    //更改完毕！
+    @GetMapping("/products/{id}")
+    public ProductPo getProductById(@PathVariable Integer id) {
+        return goodsService.getProductById(id);
     }
+
 
     /**
      * 管理员修改商品下的某个产品信息
@@ -51,10 +59,10 @@ public class GoodsController {
      * @param id
      * @return
      */
-    //body删掉了,通过！！
+    //删掉了body的注解！更改完毕！
     @PutMapping("/products/{id}")
-    public Object updateProductById(@PathVariable Integer id, Product product) {
-        return goodsService.updateProductById(product);
+    public ProductPo updateProductById(@PathVariable Integer id, ProductPo productPo) {
+        return goodsService.updateProductById(productPo);
     }
 
     /**
@@ -63,110 +71,164 @@ public class GoodsController {
      * @param id
      * @return
      */
-    //通过！！！！！
+    //@return 无（ResponseUtil.ok()即可）
+    //更改完毕！
     @DeleteMapping("/products/{id}")
     public Object deleteProductById(@PathVariable Integer id) {
-        return goodsService.deleteProductById(id);
+        Object retObi= ResponseUtil.ok(goodsService.deleteProductById(id));
+        return retObi;
     }
 
     /**
      * 新建商品
      *
-     * @param goods
-     * @return
+     * @param goodsPo
+     * @return Goods，即新建的一个商品
      */
-    //通过！！！！！！！！！！！！！！!!!!!!!!删掉了body的注解！！！！！～～～
+    //删掉了body的注解！更改完毕   ？？？？？？？是不是不能建在一级分类下面？更改同理？
+    //修改返回报错 responseUtil
     @PostMapping("/goods")
-    public Object addGoods( Goods goods) {
-        return goodsService.addGoods(goods);
+    public GoodsPo addGoods( GoodsPo goodsPo) {
+        Integer cid=goodsPo.getGoodsCategoryId();
+        if(goodsService.isFirstLevelCategory(cid)==true){
+            return null;
+        }
+
+            return goodsService.addGoods(goodsPo);
     }
 
     /**
-     * 根据id获取某个商品
+     * 管理员根据id获取某个商品
      *
      * @param id
-     * @return
+     * @return GoodsVo，即商品的信息，此URL与WX端是同一个URL
      */
-    //通过！！！！！！
-    @GetMapping("/goods/{id}")
-    public Object getGoodsById(@PathVariable(value = "id") Integer id) {
+    //更改完毕！
+    @GetMapping("admin/goods/{id}")
+    public GoodsPo getGoodsById(@PathVariable(value = "id") Integer id) {
         return goodsService.getGoodsById(id);
     }
 
-//    /**
-//     * 根据id更新商品信息
-//     *
-//     * @param goodsAllinone
-//     * @return
-//     */
-//    @PutMapping("/goods/{id}")
-//    public Object updateGoodsById(@PathVariable Integer id, @RequestBody Goods goods) {
-//        return null;
-//    }
-//
-//    /**
-//     * 根据id删除商品信息
-//     *
-//     * @param id
-//     * @return
-//     */
-//    @DeleteMapping("/goods/{id}")
-//    public Object deleteGoodsById(@PathVariable Integer id) {
-//        return null;
-//    }
+    /**
+     * 用户根据id获取某个商品
+     *
+     * @param id
+     * @return GoodsVo，即商品的信息，此URL与WX端是同一个URL，上架！！
+     */
+    //更改完毕！
+    @GetMapping("goods/{id}")
+    public GoodsPo userGetGoodsById(@PathVariable(value = "id") Integer id) {
+        return goodsService.userGetGoodsById(id);
+    }
+
 
     /**
-     * 获取商品分类信息
-     *
-     * @return
+     * 根据id更新商品信息
+     * @param id
+     * @param goodsPo
+     * @return Goods，修改后的商品信息
      */
-    // 通过！！！！！！！
-    @GetMapping("/categories/{id}/goods")
-    public Object getCategoriesInfoById(@PathVariable(value = "id")Integer id) {
-        return goodsService.getCategoriesInfoById(id);
+    //删掉了body注解！更改完毕！
+    //修改错误返回
+    @PutMapping("/goods/{id}")
+    public GoodsPo updateGoodsById(@PathVariable Integer id, GoodsPo goodsPo) {
+        Integer cid=id;
+        if(goodsService.isFirstLevelCategory(cid)==true){
+            return null;
+        }
+        return goodsService.updateGoodsById(goodsPo);
     }
 
     /**
-     * 根据条件搜索商品
+     * 根据id删除商品信息
      *
-     * @param goodsSn
-     * @param name
-     * @param page
-     * @param limit
-//     * @param sort
-//     * @param order
+     * @param id
+     * @return 无（即ResponseUtil.ok()即可）
+     */
+    //更改完毕！实现级联删除！
+    @DeleteMapping("/goods/{id}")
+    public Object deleteGoodsById(@PathVariable Integer id) {
+        goodsService.deleteGoodsById(id);
+        goodsService.deleteProductsByGoodsId(id);
+        Object retObi= ResponseUtil.ok();
+        return retObi;
+    }
+
+    /**
+     * 用户获取分类下的商品信息
+     * @param id
      * @return
      */
-// 通过，优先按name查找
-    @GetMapping("/goods")
-    public Object listGoods(String goodsSn, String name,
-                            @RequestParam(defaultValue = "1") Integer page,
-                            @RequestParam(defaultValue = "10") Integer limit){
+    //通过，分页,更改完毕！要求上架
+    @GetMapping("/categories/{id}/goods")
+    public Object getCategoriesInfoById(@PathVariable(value = "id")Integer id,
+                                        @RequestParam(defaultValue = "1") Integer page,
+                                        @RequestParam(defaultValue = "10") Integer limit) {
         PageHelper.startPage(page,limit);
-        List<Goods> goodsList = goodsService.listGoods(goodsSn,name);
-        PageInfo<Goods> GoodsPageInfo = new PageInfo<>(goodsList);
-        List<Goods> pagelist =GoodsPageInfo.getList();
+        List<GoodsPo> goodsList = goodsService.getCategoriesInfoById(id);
+        PageInfo<GoodsPo> GoodsPageInfo = new PageInfo<>(goodsList);
+        List<GoodsPo> pagelist =GoodsPageInfo.getList();
         return pagelist;
     }
 
     /**
-     * 管理员根据条件搜索品牌
+     * 用户根据条件搜索商品，上架
      *
-     * @param id
-     * @param name
+     * @param goodsSn 商品的序列号
+     * @param name 商品的名字
+     * @param page  第几页
+     * @param limit 一页多少
+     * @return
+     */
+// 通过，更改完毕！
+    @GetMapping("/goods")
+    public List<GoodsPo> listGoods(String goodsSn, String name,
+                                 @RequestParam(defaultValue = "1") Integer page,
+                                 @RequestParam(defaultValue = "10") Integer limit){
+        PageHelper.startPage(page,limit);
+        List<GoodsPo> goodsList = goodsService.listGoods(goodsSn,name);
+        PageInfo<GoodsPo> GoodsPageInfo = new PageInfo<>(goodsList);
+        List<GoodsPo> pagelist =GoodsPageInfo.getList();
+        return pagelist;
+    }
+
+    /**
+     * 管理员根据条件搜索商品
+     *
+     * @param goodsSn 商品的序列号
+     * @param name 商品的名字
+     * @param page  第几页
+     * @param limit 一页多少
+     * @return
+     */
+// 通过，更改完毕！
+    @GetMapping("/admin/goods")
+    public List<GoodsPo> adminListGoods(String goodsSn, String name,
+                                   @RequestParam(defaultValue = "1") Integer page,
+                                   @RequestParam(defaultValue = "10") Integer limit){
+        PageHelper.startPage(page,limit);
+        List<GoodsPo> goodsList = goodsService.adminListGoods(goodsSn,name);
+        PageInfo<GoodsPo> GoodsPageInfo = new PageInfo<>(goodsList);
+        List<GoodsPo> pagelist =GoodsPageInfo.getList();
+        return pagelist;
+    }
+
+    /**
+     * 管理员搜索品牌
+     *
      * @param page
      * @param limit
      * @return
      */
-    //通过
-    @GetMapping("/admin/brands")
-    public Object listBrandByCondition(Integer id, String name,
-                                       @RequestParam(defaultValue = "1") Integer page,
-                                       @RequestParam(defaultValue = "10") Integer limit) {
+    //通过,更改完毕
+    @GetMapping("/admins/brands")
+    public List<BrandPo> listBrandByCondition(
+                                            @RequestParam(defaultValue = "1") Integer page,
+                                            @RequestParam(defaultValue = "10") Integer limit) {
         PageHelper.startPage(page,limit);
-        List<Brand> brandList = goodsService.listBrandByCondition(id,name);
-        PageInfo<Brand> BrandPageInfo = new PageInfo<>(brandList);
-        List<Brand> pagelist =BrandPageInfo.getList();
+        List<BrandPo> brandList = goodsService.listBrandByCondition();
+        PageInfo<BrandPo> BrandPageInfo = new PageInfo<>(brandList);
+        List<BrandPo> pagelist =BrandPageInfo.getList();
         return pagelist;
     }
 
@@ -174,13 +236,13 @@ public class GoodsController {
     /**
      * 创建一个品牌
      *
-     * @param brand
-     * @return
+     * @param brandPo
+     * @return brandPo
      */
-    //通过！！！！！！！！！！！！！！!!!!!!!!删掉了body的注解！！！！！～～～
+    //删掉了body的注解！更改完毕!
     @PostMapping("/brands")
-    public Object addBrand(Brand brand) {
-        return goodsService.addBrand(brand);
+    public BrandPo addBrand(BrandPo brandPo) {
+        return goodsService.addBrand(brandPo);
     }
 
     /**
@@ -189,34 +251,39 @@ public class GoodsController {
      * @param id
      * @return
      */
-    //通过！！！！
+    //更改完毕!
     @GetMapping("/brands/{id}")
-    public Object getBrandById(@PathVariable Integer id) {
+    public BrandPo getBrandById(@PathVariable Integer id) {
         return goodsService.getBrandById(id);
     }
-//
-//    /**
-//     * 修改单个品牌的信息
-//     *
-//     * @param id
-//     * @param brand
-//     * @return
-//     */
-//    @PutMapping("/brands/{id}")
-//    public Object updateBrandById(@PathVariable Integer id, @RequestBody Brand brand) {
-//        return null;
-//    }
-//
+
+    /**
+     * 修改单个品牌的信息
+     *
+     * @param id
+     * @param brandPo
+     * @return
+     */
+    //删掉了body注解,更改完毕！
+    @PutMapping("/brands/{id}")
+    public BrandPo updateBrandById(@PathVariable Integer id,BrandPo brandPo) {
+        return goodsService.updateBrandById(brandPo);
+    }
+
+
     /**
      * 删除一个品牌
      *
      * @parambrand
      * @return
      */
-    //通过！！！！！
+    //级联更改，更改完毕！
     @DeleteMapping("/brands/{id}")
     public Object deleteBrandById(@PathVariable(value = "id")Integer id) {
-        return goodsService.deleteBrandById(id);
+        goodsService.deleteBrandById(id);
+        goodsService.nullBrandGoodsPoList(id);
+        Object retObi= ResponseUtil.ok();
+        return retObi;
     }
 
     /**
@@ -224,22 +291,26 @@ public class GoodsController {
      *
      * @return
      */
-    //通过！！！！
+    //通过，更改完毕，和标准组不同
     @GetMapping("/categories")
-    public Object listGoodsCategory() {
+    public List<GoodsCategoryPo> listGoodsCategory() {
         return goodsService.listGoodsCategory();
     }
 
     /**
      * 新建一个分类
      *
-     * @param goodsCategory
+     * @param goodsCategoryPo
      * @return
      */
-    //通过！！！！！！！！！！！！！！!!!!!!!!删掉了body的注解！！！！！～～～
+    //删掉了body的注解,更改完毕！修改返回
     @PostMapping("/categories")
-    public Object addGoodsCategory(GoodsCategory goodsCategory) {
-        return goodsService.addGoodsCategory(goodsCategory);
+    public GoodsCategoryPo addGoodsCategory(GoodsCategoryPo goodsCategoryPo) {
+        Integer cid=goodsCategoryPo.getId();
+        if(goodsService.isFirstLevelCategory(cid)==true){
+            return null;
+        }
+        return goodsService.addGoodsCategory(goodsCategoryPo);
     }
 
     /**
@@ -248,9 +319,9 @@ public class GoodsController {
      * @param id
      * @return
      */
-    //通过！！！！！！
+    //通过，更改完毕，和标准组不同
     @GetMapping("/categories/{id}")
-    public Object getGoodsCategoryById(@PathVariable Integer id) {
+    public GoodsCategoryPo getGoodsCategoryById(@PathVariable Integer id) {
         return goodsService.getGoodsCategoryById(id);
     }
 
@@ -258,75 +329,99 @@ public class GoodsController {
      * 修改分类信息
      *
      * @param id
-     * @param goodsCategory
+     * @param goodsCategoryPo
      * @return
      */
-//    @PutMapping("/categories/{id}")
-//    public Object updateGoodsCategoryById(@PathVariable Integer id, @RequestBody GoodsCategory goodsCategory) {
-//        return null;
-//    }
-//
-//    /**
-//     * 删除单个分类
-//     *
-//     * @param id
-//     * @param goodsCategory
-//     * @return
-//     */
-//    @DeleteMapping("/categories/{id}")
-//    public Object deleteGoodsCategory(@PathVariable Integer id, @RequestBody GoodsCategory goodsCategory) {
-//        return null;
-//    }
-//
-//    /**
-//     * 查看所有一级分类
-//     *
-//     * @return
-//     */
-//    @GetMapping("/categories/l1")
-//    public Object listOneLevelGoodsCategory() {
-//        return null;
-//    }
+    //删掉body注解，更改通过！修改返回
+    @PutMapping("/categories/{id}")
+    public GoodsCategoryPo updateGoodsCategoryById(@PathVariable Integer id,GoodsCategoryPo goodsCategoryPo) {
+        Integer cid=id;
+        if(goodsService.isFirstLevelCategory(cid)==true){
+            return null;
+        }
+        return goodsService.updateGoodsCategoryById(goodsCategoryPo);
+    }
 
     /**
-     * 查看所有品牌
+     * 删除单个分类
+     *
+     * @param id
+     * @return
+     */
+    //判断1级，2级，1级有级联删除和级联更改，2级有级联更改，更改完毕！
+    //deleteGoodsCategory是删除自己，nullCategoryGoodsPoList是级联更改名下商品
+    //point是该目录的pid  null是一级目录，非null是二级
+    @DeleteMapping("/categories/{id}")
+    public Object deleteGoodsCategory(@PathVariable Integer id) {
+        GoodsCategoryPo goodsCategoryPo=goodsService.getGoodsCategoryById(id);
+        Integer point= goodsCategoryPo.getPid();
+        if(point==null){
+            List<Integer> list=goodsService.getSecondLevelId(id);
+            for(Integer i : list) {
+                goodsService.nullCategoryGoodsPoList(i);
+            }
+            goodsService.deleteSecondLevelCategory(id);
+            goodsService.deleteGoodsCategory(id);
+
+        }
+        if(point!=null){
+            goodsService.nullCategoryGoodsPoList(id);
+            goodsService.deleteGoodsCategory(id);
+        }
+        Object retObi= ResponseUtil.ok();
+        return retObi;
+    }
+
+
+
+    /**
+     * 用户查看所有品牌
      *
      * @param page
      * @param limit
      * @return
      */
-    //通过
+    //更改通过，和标准组不同
     @GetMapping("/brands")
-    public Object listBrand(@RequestParam Integer page,
-                            @RequestParam Integer limit){
+    public List<BrandPo> listBrand(@RequestParam(defaultValue = "1")  Integer page,
+                            @RequestParam(defaultValue = "10")  Integer limit){
         PageHelper.startPage(page,limit);
-        List<Brand> brandList = goodsService.listBrand();
-        PageInfo<Brand> BrandPageInfo = new PageInfo<>(brandList);
-        List<Brand> pagelist =BrandPageInfo.getList();
+        List<BrandPo> brandList = goodsService.listBrand();
+        PageInfo<BrandPo> BrandPageInfo = new PageInfo<>(brandList);
+        List<BrandPo> pagelist =BrandPageInfo.getList();
         return pagelist;
     }
 
-//    /**
-//     * 获取当前一级分类下的二级分类？？？一二级怎么判断？？？
-//     *
-//     * @param id 分类类目ID
-//     * @return 当前分类栏目
-//     */
-//    @GetMapping("categories/l1/{id}/l2")
-//    public Object listSecondLevelGoodsCategoryById(Integer id) {
-//        return null;
-//    }
-
-    /**
-     * 根据id获得产品对象
+        /**
+     * 查看所有一级分类
      *
-     * @param id
      * @return
      */
-    //通过！！！！！
-    @GetMapping("/products/{id}")
-    public Object getProductById(@PathVariable Integer id) {
-        return goodsService.getProductById(id);
+        //更改完毕，和标准组不同
+    @GetMapping("/categories/l1")
+    public List<GoodsCategoryPo> listOneLevelGoodsCategory() {
+        return goodsService.listOneLevelGoodsCategory();
+    }
+
+    /**
+     * 获取当前一级分类下的二级分类
+     *
+     * @param id 分类类目ID
+     * @return 当前分类栏目
+     */
+    //更改完毕，和标准组不同
+    @GetMapping("categories/l1/{id}/l2")
+    public List<GoodsCategoryPo> listSecondLevelGoodsCategoryById(@PathVariable Integer id) {
+        return goodsService.listSecondLevelGoodsCategoryById(id);
+    }
+    //判断商品是否在售（上架）
+    @GetMapping("/goods/{id}/isOnSale")
+    public boolean isOnSale(@PathVariable Integer id){
+        GoodsPo goodsPo=userGetGoodsById(id);
+        if(goodsPo.getStatusCode()==0){
+            return false;
+        }
+        return true;
     }
 
 }

@@ -1,53 +1,51 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.example.goods.mapper.ProductMapper">
-    <select id="listProductByGoodsId" parameterType="integer" resultType="com.example.goods.domain.Product">
+    <select id="listProductByGoodsId" parameterType="integer" resultType="com.example.goods.domain.ProductPo">
         select id,
-               product_ids,
                pic_url,
                specifications,
                goods_id,
                price,
                safety_stock,
                gmt_create,
-               gmt_modified,
-               is_deleted
+               gmt_modified
                from product where goods_id=#{id} and is_deleted=0
     </select>
-    <insert id="addProductByGoodsId" parameterType="com.example.goods.domain.Product" useGeneratedKeys="true" keyProperty="id">
-          insert into product (product_ids,pic_url,specifications,goods_id,price,safety_stock,gmt_create,gmt_modified,is_deleted)
-          values (#{productIds},#{picUrl},#{specifications},#{goodsId},#{price},#{safetyStock},current_timestamp ,current_timestamp ,0)
+    <insert id="addProductByGoodsId" parameterType="com.example.goods.domain.ProductPo" useGeneratedKeys="true" keyProperty="id">
+          insert into product (pic_url,specifications,goods_id,price,safety_stock,gmt_create,gmt_modified,is_deleted)
+          values (#{picUrl},#{specifications},#{goodsId},#{price},#{safetyStock},current_timestamp ,current_timestamp ,0)
     </insert>
     <update id="deleteProductById" parameterType="integer">
         update product
         set is_deleted=1
         where id=#{id}
     </update>
-    <select id="getProductById" parameterType="integer" resultType="com.example.goods.domain.Product">
+    <select id="getProductById" parameterType="integer" resultType="com.example.goods.domain.ProductPo">
         select id,
-               product_ids,
                pic_url,
                specifications,
                goods_id,
                price,
                safety_stock,
                gmt_create,
-               gmt_modified,
-               is_deleted
+               gmt_modified
                from product where id=#{id} and is_deleted=0
     </select>
-    <update id="updateProductById" parameterType="com.example.goods.domain.Product">
+    <update id="updateProductById" parameterType="com.example.goods.domain.ProductPo">
         update product
-        set    product_ids=#{productIds},
-               pic_url=#{picUrl},
+        set    pic_url=#{picUrl},
                specifications=#{specifications},
                goods_id=#{goodsId},
                price=#{price},
                safety_stock=#{safetyStock},
-               gmt_create=#{gmtCreate},
-               gmt_modified=current_timestamp,
-               is_deleted=#{beDeleted}
+               gmt_modified=current_timestamp
                where id=#{id}
+    </update>
+    <update id="deleteProductsByGoodsId" parameterType="integer">
+        update product
+        set is_deleted=1
+        where goods_id=#{id};
     </update>
 
 </mapper>

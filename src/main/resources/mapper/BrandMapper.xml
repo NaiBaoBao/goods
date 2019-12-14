@@ -6,39 +6,7 @@
         set is_deleted=1
         where id=#{id}
     </update>
-    <select id="listBrandByCondition" resultType="com.example.goods.domain.Brand">
-        select id,
-        name,
-        description,
-        pic_url,
-        gmt_create,
-        gmt_modified,
-        is_deleted
-        from brand
-        where
-        <if test="id!=null">
-            id=#{id} and
-        </if>
-        <if test="name!=null">
-            name=#{name} and
-        </if>
-        is_deleted=0
-    </select>
-    <select id="getBrandById" parameterType="integer" resultType="com.example.goods.domain.Brand">
-        select id,
-               name,
-               description,
-               pic_url,
-               gmt_create,
-               gmt_modified,
-               is_deleted
-               from brand where id=#{id} and is_deleted=0
-    </select>
-    <insert id="addBrand" parameterType="com.example.goods.domain.Brand" useGeneratedKeys="true" keyProperty="id">
-        insert into brand (name,description,pic_url,gmt_create,gmt_modified,is_deleted)
-        values (#{name},#{description},#{picUrl},current_timestamp ,current_timestamp,0)
-    </insert>
-    <select id="listBrand" resultType="com.example.goods.domain.Brand">
+    <select id="listBrandByCondition" resultType="com.example.goods.domain.BrandPo">
         select id,
         name,
         description,
@@ -49,4 +17,37 @@
         from brand
         where is_deleted=0
     </select>
+    <select id="listBrand" resultType="com.example.goods.domain.BrandPo">
+        select id,
+        name,
+        description,
+        pic_url,
+        gmt_create,
+        gmt_modified,
+        is_deleted
+        from brand
+        where is_deleted=0
+    </select>
+    <select id="getBrandById" parameterType="integer" resultType="com.example.goods.domain.BrandPo">
+        select id,
+               name,
+               description,
+               pic_url,
+               gmt_create,
+               gmt_modified
+               from brand where id=#{id} and is_deleted=0
+    </select>
+    <insert id="addBrand" useGeneratedKeys="true" keyProperty="id">
+        insert into brand (name,description,pic_url,gmt_create,gmt_modified,is_deleted)
+        values (#{name},#{description},#{picUrl},current_timestamp ,current_timestamp,0)
+    </insert>
+    <update id="updateBrandById" parameterType="com.example.goods.domain.BrandPo">
+        update brand
+        set    name=#{name},
+               description=#{description},
+               pic_url=#{picUrl},
+               gmt_modified=current_timestamp
+               where id=#{id}
+    </update>
+
 </mapper>

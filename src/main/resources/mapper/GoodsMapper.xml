@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.example.goods.mapper.GoodsMapper">
-    <select id="getGoodsById" parameterType="integer" resultType="com.example.goods.domain.Goods">
+    <select id="getGoodsById" parameterType="integer" resultType="com.example.goods.domain.GoodsPo">
         select  id,
                 gmt_create,
                 gmt_modified,
@@ -17,7 +17,6 @@
                 gallery,
                 goods_category_id,
                 brand_id,
-                is_deleted,
                 weight,
                 volume,
                 special_freight_id,
@@ -25,7 +24,7 @@
                 price
                 from goods where id=#{id} and is_deleted=0
     </select>
-    <select id="getCategoriesInfoById" parameterType="integer" resultType="com.example.goods.domain.Goods">
+        <select id="userGetGoodsById" parameterType="integer" resultType="com.example.goods.domain.GoodsPo">
         select  id,
                 gmt_create,
                 gmt_modified,
@@ -41,15 +40,14 @@
                 gallery,
                 goods_category_id,
                 brand_id,
-                is_deleted,
                 weight,
                 volume,
                 special_freight_id,
                 is_special,
                 price
-                from goods where goods_category_id=#{id}
+                from goods where id=#{id} and is_deleted=0 and status!=0
     </select>
-    <select id="listGoods" resultType="com.example.goods.domain.Goods">
+    <select id="getCategoriesInfoById" parameterType="integer" resultType="com.example.goods.domain.GoodsPo">
         select  id,
                 gmt_create,
                 gmt_modified,
@@ -65,7 +63,29 @@
                 gallery,
                 goods_category_id,
                 brand_id,
-                is_deleted,
+                weight,
+                volume,
+                special_freight_id,
+                is_special,
+                price
+                from goods where goods_category_id=#{id} and is_deleted=0 and status!=0
+    </select>
+    <select id="listGoods" resultType="com.example.goods.domain.GoodsPo">
+        select  id,
+                gmt_create,
+                gmt_modified,
+                name,
+                goods_sn,
+                short_name,
+                description,
+                brief,
+                pic_url,
+                detail,
+                status,
+                share_url,
+                gallery,
+                goods_category_id,
+                brand_id,
                 weight,
                 volume,
                 special_freight_id,
@@ -73,16 +93,110 @@
                 price
                 from goods
                 where
-                <if test="goodsSn!=null">
-                        goods_sn=#{goodsSn} and
+                <if test="name!=null">
+                name=#{name} and
                 </if>
+                <if test="goodsSn!=null">
+                goods_sn=#{goodsSn} and
+                </if>
+                is_deleted=0 and status!=0
+    </select>
+        <select id="adminListGoods" resultType="com.example.goods.domain.GoodsPo">
+                select  id,
+                gmt_create,
+                gmt_modified,
+                name,
+                goods_sn,
+                short_name,
+                description,
+                brief,
+                pic_url,
+                detail,
+                status,
+                share_url,
+                gallery,
+                goods_category_id,
+                brand_id,
+                weight,
+                volume,
+                special_freight_id,
+                is_special,
+                price
+                from goods
+                where
                 <if test="name!=null">
                         name=#{name} and
                 </if>
+                <if test="goodsSn!=null">
+                        goods_sn=#{goodsSn} and
+                </if>
                 is_deleted=0
-    </select>
-        <insert id="addGoods" parameterType="com.example.goods.domain.Goods" useGeneratedKeys="true" keyProperty="id">
+        </select>
+        <insert id="addGoods" parameterType="com.example.goods.domain.GoodsPo" useGeneratedKeys="true" keyProperty="id">
                 insert into goods (gmt_create,gmt_modified,name,goods_sn,short_name,description,brief,pic_url,detail,status,share_url,gallery,goods_category_id,brand_id,is_deleted,weight,volume,special_freight_id,is_special,price)
-                values (current_timestamp ,current_timestamp,#{name},#{goodsSn},#{shortName},#{description},#{brief},#{picUrl},#{detail},#{status},#{shareUrl},#{gallery},#{goodsCategoryId},#{brandId},0,#{weight},#{volume},#{specialFreightId},#{beSpecial},#{price})
+                values (current_timestamp ,current_timestamp,#{name},#{goodsSn},#{shortName},#{description},#{brief},#{picUrl},#{detail},#{statusCode},#{shareUrl},#{gallery},#{goodsCategoryId},#{brandId},0,#{weight},#{volume},#{specialFreightId},#{beSpecial},#{price})
         </insert>
+        <update id="updateGoodsById" parameterType="com.example.goods.domain.GoodsPo">
+                update goods
+                set gmt_modified=current_timestamp ,
+                name=#{name},
+                goods_sn=#{goodsSn},
+                short_name=#{shortName},
+                description=#{description},
+                brief=#{brief},
+                pic_url=#{picUrl},
+                detail=#{detail},
+                status=#{statusCode},
+                share_url=#{shareUrl},
+                gallery=#{gallery},
+                goods_category_id=#{goodsCategoryId},
+                brand_id=#{brandId},
+                weight=#{weight},
+                volume=#{volume},
+                special_freight_id=#{specialFreightId},
+                is_special=#{beSpecial},
+                price=#{price}
+                where id=#{id};
+        </update>
+        <update id="deleteGoodsById" parameterType="integer">
+                update goods
+                set is_deleted=1
+                where id=#{id}
+        </update>
+        <update id="nullBrandGoodsPoList" parameterType="integer">
+                update goods
+                set brand_id=null ,
+                    gmt_modified=current_timestamp
+                where brand_id=#{id}
+        </update>
+        <select id="listBrand" resultType="com.example.goods.domain.Brand">
+        select id
+        gmt_create,
+        gmt_modified,
+        name,
+        goods_sn,
+        short_name,
+        description,
+        brief,
+        pic_url,
+        detail,
+        status,
+        share_url,
+        gallery,
+        goods_category_id,
+        brand_id,
+        weight,
+        volume,
+        special_freight_id,
+        is_special,
+        price
+        from goods
+        where brand_id=#{id} and is_deleted=0
+    </select>
+        <update id="nullCategoryGoodsPoList" parameterType="integer">
+                update goods
+                set goods_category_id=null,
+                    gmt_modified=current_timestamp
+                where goods_category_id=#{id}
+        </update>
 </mapper>

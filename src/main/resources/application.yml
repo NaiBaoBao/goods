@@ -13,3 +13,5 @@ pagehelper:
   reasonable: true
   support-methods-arguments: true
   params: count=countsql
+server:
+  port: 8011

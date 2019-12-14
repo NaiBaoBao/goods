@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.example.goods.mapper.ProductMapper">
-    <select id="listProductByGoodsId" parameterType="integer" resultType="com.example.goods.domain.ProductPo">
+    <resultMap  type="com.example.goods.domain.ProductPo" id="ProductPo">
+        <id property="id" column="id"/>
+        <result property="goodsId" column="goods_id"/>
+        <result property="picUrl" column="pic_url"/>
+        <result property="specifications" column="specifications"/>
+        <result property="price" column="price"/>
+        <result property="safetyStock" column="safety_stock"/>
+        <result property="gmtCreate" column="gmt_create"/>
+        <result property="gmtModified" column="gmt_modified"/>
+    </resultMap>
+    <select id="listProductByGoodsId" parameterType="integer" resultMap="ProductPo">
         select id,
                pic_url,
                specifications,
@@ -21,7 +31,7 @@
         set is_deleted=1
         where id=#{id}
     </update>
-    <select id="getProductById" parameterType="integer" resultType="com.example.goods.domain.ProductPo">
+    <select id="getProductById" parameterType="integer" resultMap="ProductPo">
         select id,
                pic_url,
                specifications,
@@ -47,5 +57,4 @@
         set is_deleted=1
         where goods_id=#{id};
     </update>
-
 </mapper>

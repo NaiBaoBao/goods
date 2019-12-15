@@ -1,12 +1,17 @@
 package com.example.goods.controller;
 
 import com.example.goods.domain.*;
+//import com.example.goods.feign.FootprintApi;
 import com.example.goods.service.GoodsService;
+import com.example.goods.util.FileUtils;
 import com.example.goods.util.ResponseUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 
 @RestController
@@ -14,6 +19,31 @@ import java.util.List;
 public class GoodsController {
     @Autowired
     private GoodsService goodsService;
+//    @Autowired
+//    private FootprintApi footprintApi;
+
+    @Value("${web.path}")
+    private String path;
+    /**
+     * 上传图片到服务器 返回图片地址
+     *
+     * @param file
+     * @return url 图片在服务器上的地址
+     */
+    @PostMapping("/pic")
+    public Object pic(@RequestParam("file") MultipartFile file){
+        String localPath = "/Users/catherinewang/Desktop/picture";
+        String fileName = file.getOriginalFilename();
+        String newFile = FileUtils.upload(file,localPath,fileName);
+        Object retObj;
+        if(newFile != null){
+            retObj = ResponseUtil.ok(localPath+"\\"+newFile);
+        }else{
+            retObj = ResponseUtil.fail(502,"图片上传失败");
+        }
+        return retObj;
+    }
+
 
     /**
      * 管理员查询商品下的产品，可看下架
@@ -118,6 +148,7 @@ public class GoodsController {
     //更改完毕！
     @GetMapping("goods/{id}")
     public GoodsPo userGetGoodsById(@PathVariable(value = "id") Integer id) {
+        //footprintAPI.addFootprint()？？？？？？？？？？？？？足迹
         return goodsService.userGetGoodsById(id);
     }
 
@@ -153,19 +184,67 @@ public class GoodsController {
         Object retObi= ResponseUtil.ok();
         return retObi;
     }
+    /*
+    *
+    *
+    *
+     */
 
+    //管理员通过品牌查询商品，更改完毕，
+    @GetMapping("/admins/brands/{id}/goods")
+    public List<GoodsPo> getBrandsInfoById(@PathVariable(value = "id")Integer id){
+        return goodsService.getBrandsInfoById(id);
+    }
+    /*
+     *
+     *!!!!!
+     *
+     */
+
+    //用户通过品牌查询商品，更改完毕
+    @GetMapping("/brands/{id}/goods")
+    public List<GoodsPo> userGetBrandsInfoById(@PathVariable(value = "id")Integer id){
+        return goodsService.userGetBrandsInfoById(id);
+    }
     /**
      * 用户获取分类下的商品信息
      * @param id
      * @return
      */
     //通过，分页,更改完毕！要求上架
+    //判断是一级分类还是二级分类，一级分类要返回"是一级分类"
     @GetMapping("/categories/{id}/goods")
     public Object getCategoriesInfoById(@PathVariable(value = "id")Integer id,
                                         @RequestParam(defaultValue = "1") Integer page,
                                         @RequestParam(defaultValue = "10") Integer limit) {
+        Integer cid=id;
+        if(goodsService.isFirstLevelCategory(cid)==true){
+            return null;
+        }
         PageHelper.startPage(page,limit);
         List<GoodsPo> goodsList = goodsService.getCategoriesInfoById(id);
+        PageInfo<GoodsPo> GoodsPageInfo = new PageInfo<>(goodsList);
+        List<GoodsPo> pagelist =GoodsPageInfo.getList();
+        return pagelist;
+    }
+
+    /**
+     * 管理员获取分类下的商品信息
+     * @param id
+     * @return
+     */
+    //通过，分页,更改完毕！
+    //判断是一级分类还是二级分类，一级分类要返回"是一级分类"
+    @GetMapping("/admins/categories/{id}/goods")
+    public Object adminGetCategoriesInfoById(@PathVariable(value = "id")Integer id,
+                                        @RequestParam(defaultValue = "1") Integer page,
+                                        @RequestParam(defaultValue = "10") Integer limit) {
+        Integer cid=id;
+        if(goodsService.isFirstLevelCategory(cid)==true){
+            return null;
+        }
+        PageHelper.startPage(page,limit);
+        List<GoodsPo> goodsList = goodsService.adminGetCategoriesInfoById(id);
         PageInfo<GoodsPo> GoodsPageInfo = new PageInfo<>(goodsList);
         List<GoodsPo> pagelist =GoodsPageInfo.getList();
         return pagelist;
@@ -214,7 +293,7 @@ public class GoodsController {
     }
 
     /**
-     * 管理员搜索品牌
+     * 管理员根据条件搜索品牌
      *
      * @param page
      * @param limit
@@ -222,11 +301,11 @@ public class GoodsController {
      */
     //通过,更改完毕
     @GetMapping("/admins/brands")
-    public List<BrandPo> listBrandByCondition(
+    public List<BrandPo> listBrandByCondition(@RequestParam Integer id,@RequestParam String name,
                                             @RequestParam(defaultValue = "1") Integer page,
                                             @RequestParam(defaultValue = "10") Integer limit) {
         PageHelper.startPage(page,limit);
-        List<BrandPo> brandList = goodsService.listBrandByCondition();
+        List<BrandPo> brandList = goodsService.listBrandByCondition(id,name);
         PageInfo<BrandPo> BrandPageInfo = new PageInfo<>(brandList);
         List<BrandPo> pagelist =BrandPageInfo.getList();
         return pagelist;
@@ -246,15 +325,31 @@ public class GoodsController {
     }
 
     /**
-     * 查看品牌详情,此API与商城端/brands/{id}完全相同
+     * 管理员查看品牌详情,此API与商城端/brands/{id}完全相同
+     *
+     * @param id
+     * @return
+     */
+    //更改完毕!
+    @GetMapping("/admins/brands/{id}")
+    public Brand adminGetBrandById(@PathVariable Integer id) {
+        Brand brand=goodsService.getBrandById(id);
+        brand.setGoodsPoList(goodsService.getBrandsInfoById(id));
+        return brand;
+    }
+
+    /**
+     *用户查看品牌详情,此API与商城端/brands/{id}完全相同
      *
      * @param id
      * @return
      */
     //更改完毕!
     @GetMapping("/brands/{id}")
-    public BrandPo getBrandById(@PathVariable Integer id) {
-        return goodsService.getBrandById(id);
+    public Brand userGetBrandById(@PathVariable Integer id) {
+        Brand brand=goodsService.getBrandById(id);
+        brand.setGoodsPoList(goodsService.userGetBrandsInfoById(id));
+        return brand;
     }
 
     /**
@@ -291,10 +386,15 @@ public class GoodsController {
      *
      * @return
      */
-    //通过，更改完毕，和标准组不同
+    //通过，更改完毕
     @GetMapping("/categories")
-    public List<GoodsCategoryPo> listGoodsCategory() {
-        return goodsService.listGoodsCategory();
+    public List<GoodsCategoryPo> listGoodsCategory(@RequestParam(defaultValue = "1") Integer page,
+                                                   @RequestParam(defaultValue = "10") Integer limit) {
+        PageHelper.startPage(page,limit);
+        List<GoodsCategoryPo> categoryPoList = goodsService.listGoodsCategory();
+        PageInfo<GoodsCategoryPo> CategoryPageInfo = new PageInfo<>(categoryPoList);
+        List<GoodsCategoryPo> pagelist =CategoryPageInfo.getList();
+        return pagelist;
     }
 
     /**
@@ -314,16 +414,33 @@ public class GoodsController {
     }
 
     /**
-     * 查看单个分类信息
+     * 管理员查看单个分类信息
      *
      * @param id
      * @return
      */
-    //通过，更改完毕，和标准组不同
-    @GetMapping("/categories/{id}")
-    public GoodsCategoryPo getGoodsCategoryById(@PathVariable Integer id) {
-        return goodsService.getGoodsCategoryById(id);
+    //通过，更改完毕
+    @GetMapping("/admins/categories/{id}")
+    public Object getGoodsCategoryById(@PathVariable Integer id) {
+        GoodsCategory goodsCategory=goodsService.getCategoryById(id);
+        goodsCategory.setGoodsPoList(goodsService.adminGetCategoriesInfoById(id));
+        return goodsCategory;
     }
+
+    /**
+     * 用户查看单个分类信息
+     *
+     * @param id
+     * @return
+     */
+    //通过，更改完毕
+    @GetMapping("/categories/{id}")
+    public Object adminGetGoodsCategoryById(@PathVariable Integer id) {
+        GoodsCategory goodsCategory=goodsService.getCategoryById(id);
+        goodsCategory.setGoodsPoList(goodsService.getCategoriesInfoById(id));
+        return goodsCategory;
+    }
+
 
     /**
      * 修改分类信息
@@ -353,7 +470,7 @@ public class GoodsController {
     //point是该目录的pid  null是一级目录，非null是二级
     @DeleteMapping("/categories/{id}")
     public Object deleteGoodsCategory(@PathVariable Integer id) {
-        GoodsCategoryPo goodsCategoryPo=goodsService.getGoodsCategoryById(id);
+        GoodsCategoryPo goodsCategoryPo=goodsService.getGoodsCategoryPoById(id);
         Integer point= goodsCategoryPo.getPid();
         if(point==null){
             List<Integer> list=goodsService.getSecondLevelId(id);
@@ -381,7 +498,7 @@ public class GoodsController {
      * @param limit
      * @return
      */
-    //更改通过，和标准组不同
+    //更改通过
     @GetMapping("/brands")
     public List<BrandPo> listBrand(@RequestParam(defaultValue = "1")  Integer page,
                             @RequestParam(defaultValue = "10")  Integer limit){
@@ -397,9 +514,9 @@ public class GoodsController {
      *
      * @return
      */
-        //更改完毕，和标准组不同
+        //更改完毕
     @GetMapping("/categories/l1")
-    public List<GoodsCategoryPo> listOneLevelGoodsCategory() {
+    public List<GoodsCategoryPo> listOneLevelCategory() {
         return goodsService.listOneLevelGoodsCategory();
     }
 
@@ -409,7 +526,7 @@ public class GoodsController {
      * @param id 分类类目ID
      * @return 当前分类栏目
      */
-    //更改完毕，和标准组不同
+    //更改完毕
     @GetMapping("categories/l1/{id}/l2")
     public List<GoodsCategoryPo> listSecondLevelGoodsCategoryById(@PathVariable Integer id) {
         return goodsService.listSecondLevelGoodsCategoryById(id);

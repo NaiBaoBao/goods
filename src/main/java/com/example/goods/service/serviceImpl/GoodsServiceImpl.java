@@ -1,12 +1,10 @@
 package com.example.goods.service.serviceImpl;
 
 import com.example.goods.domain.*;
-import com.example.goods.mapper.BrandMapper;
-import com.example.goods.mapper.GoodsCategoryMapper;
-import com.example.goods.mapper.GoodsMapper;
-import com.example.goods.mapper.ProductMapper;
+import com.example.goods.mapper.*;
 import com.example.goods.service.GoodsService;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -20,6 +18,10 @@ public class GoodsServiceImpl implements GoodsService {
     private GoodsCategoryMapper goodsCategoryMapper;
     @Resource
     private GoodsMapper goodsMapper;
+    @Resource
+    private CategoryMapper categoryMapper;
+    @Resource
+    private BMapper bMapper;
 
     @Override
     public List<ProductPo> listProductByGoodsId(Integer id) {
@@ -57,6 +59,12 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
+    public List<GoodsPo> adminGetCategoriesInfoById(Integer id) {
+        return goodsMapper.adminGetCategoriesInfoById(id);
+    }
+
+
+    @Override
     public List<GoodsPo> listGoods(String goodsSn, String name) {
         return goodsMapper.listGoods(goodsSn, name);
     }
@@ -67,8 +75,8 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
-    public List<BrandPo> listBrandByCondition() {
-        return brandMapper.listBrandByCondition();
+    public List<BrandPo> listBrandByCondition(Integer id,String name) {
+        return brandMapper.listBrandByCondition(id,name);
     }
 
     @Override
@@ -84,8 +92,8 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
-    public BrandPo getBrandById(Integer id) {
-        return brandMapper.getBrandById(id);
+    public BrandPo getBrandPoById(Integer id) {
+        return brandMapper.getBrandPoById(id);
     }
 
     @Override
@@ -98,25 +106,25 @@ public class GoodsServiceImpl implements GoodsService {
     @Override
     public BrandPo addBrand(BrandPo brandPo) {
         brandMapper.addBrand(brandPo);
-        return brandMapper.getBrandById(brandPo.getId());
+        return brandMapper.getBrandPoById(brandPo.getId());
     }
 
     @Override
     public BrandPo updateBrandById(BrandPo brandPo) {
         brandMapper.updateBrandById(brandPo);
-        return brandMapper.getBrandById(brandPo.getId());
+        return brandMapper.getBrandPoById(brandPo.getId());
     }
 
     @Override
     public GoodsCategoryPo addGoodsCategory(GoodsCategoryPo goodsCategoryPo) {
         //不能是二级分类下的分类
         goodsCategoryMapper.addGoodsCategory(goodsCategoryPo);
-        return goodsCategoryMapper.getGoodsCategoryById(goodsCategoryPo.getId());
+        return goodsCategoryMapper.getGoodsCategoryPoById(goodsCategoryPo.getId());
     }
 
     @Override
-    public GoodsCategoryPo getGoodsCategoryById(Integer id) {
-        return goodsCategoryMapper.getGoodsCategoryById(id);
+    public GoodsCategoryPo getGoodsCategoryPoById(Integer id) {
+        return goodsCategoryMapper.getGoodsCategoryPoById(id);
     }
 
     @Override
@@ -128,7 +136,7 @@ public class GoodsServiceImpl implements GoodsService {
     public GoodsCategoryPo updateGoodsCategoryById(GoodsCategoryPo goodsCategoryPo) {
         //不能是二级分类下的分类
         goodsCategoryMapper.updateGoodsCategoryById(goodsCategoryPo);
-        return goodsCategoryMapper.getGoodsCategoryById(goodsCategoryPo.getId());
+        return goodsCategoryMapper.getGoodsCategoryPoById(goodsCategoryPo.getId());
     }
 
     @Override
@@ -195,10 +203,26 @@ public class GoodsServiceImpl implements GoodsService {
 
     @Override
     public boolean isFirstLevelCategory(Integer id) {
-        GoodsCategoryPo goodsCategoryPo = getGoodsCategoryById(id);
+        GoodsCategoryPo goodsCategoryPo = getGoodsCategoryPoById(id);
         Integer p = goodsCategoryPo.getPid();
         if (p == null)
             return true;
         return false;
+    }
+    @Override
+    public List<GoodsPo> getBrandsInfoById(Integer id){
+        return goodsMapper.getBrandsInfoById(id);
+    }
+    @Override
+    public List<GoodsPo> userGetBrandsInfoById(Integer id){
+        return goodsMapper.getBrandsInfoById(id);
+    }
+    @Override
+    public GoodsCategory getCategoryById(Integer id){
+        return categoryMapper.getCategoryById(id);
+    }
+    @Override
+    public Brand getBrandById(Integer id){
+        return bMapper.getBrandById(id);
     }
 }

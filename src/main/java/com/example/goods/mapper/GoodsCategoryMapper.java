@@ -9,11 +9,12 @@ import java.util.List;
 public interface GoodsCategoryMapper {
     public List<GoodsCategoryPo> listGoodsCategory();
     public int addGoodsCategory(GoodsCategoryPo goodsCategoryPo);
-    public GoodsCategoryPo getGoodsCategoryById(Integer id);
+    public GoodsCategoryPo getGoodsCategoryPoById(Integer id);
     public int updateGoodsCategoryById(GoodsCategoryPo goodsCategoryPo);
     public int deleteGoodsCategory(Integer id);
     public List<GoodsCategoryPo> listOneLevelGoodsCategory();
     public List<GoodsCategoryPo> listSecondLevelGoodsCategoryById(Integer id);
     public int deleteSecondLevelCategory(Integer id);
     public List<Integer> getSecondLevelId(Integer id);
+
 }

@@ -19,16 +19,17 @@ public interface GoodsService {
     GoodsPo getGoodsById(Integer id);
     GoodsPo userGetGoodsById(Integer id);
     List<GoodsPo> getCategoriesInfoById(Integer id);
+    List<GoodsPo> adminGetCategoriesInfoById(Integer id);
     List<GoodsPo> listGoods(String goodsSn,String name);
     List<GoodsPo> adminListGoods(String goodsSn,String name);
-    List<BrandPo> listBrandByCondition();
+    List<BrandPo> listBrandByCondition(Integer id,String name);
     ProductPo addProductByGoodsId(ProductPo productPo);
     int deleteProductById(Integer id);
-    BrandPo getBrandById(Integer id);
+
     GoodsPo addGoods(GoodsPo goodsPo);
     BrandPo addBrand(BrandPo brandPo);
     GoodsCategoryPo addGoodsCategory(GoodsCategoryPo goodsCategoryPo);
-    GoodsCategoryPo getGoodsCategoryById(Integer id);
+
     GoodsCategoryPo updateGoodsCategoryById(GoodsCategoryPo goodsCategoryPo);
     int deleteGoodsCategory(Integer id);
     int nullCategoryGoodsPoList(Integer id);
@@ -37,12 +38,25 @@ public interface GoodsService {
     GoodsPo updateGoodsById(GoodsPo goodsPo);
     int deleteGoodsById(Integer id);
     int deleteProductsByGoodsId(Integer id);
-    List<GoodsCategoryPo> listOneLevelGoodsCategory();
+
     BrandPo updateBrandById(BrandPo brandPo);
-    List<GoodsCategoryPo> listSecondLevelGoodsCategoryById(Integer id);
+
     int deleteSecondLevelCategory(Integer id);
     List<Integer> getSecondLevelId(Integer id);
     boolean isFirstLevelCategory(Integer id);
-    //用户端，或者公共（如果区分上下架状态，就没有公共了？）
+
+    List<GoodsPo> getBrandsInfoById(Integer id);
+    List<GoodsPo> userGetBrandsInfoById(Integer id);
+
+    BrandPo getBrandPoById(Integer id);
+    GoodsCategoryPo getGoodsCategoryPoById(Integer id);
+    //专门用来返回category的函数1
+    GoodsCategory getCategoryById(Integer id);
+    //专门用来返回brand的函数1
+    Brand getBrandById(Integer id);
+    //
+    List<GoodsCategoryPo> listOneLevelGoodsCategory();
+    //
+    List<GoodsCategoryPo> listSecondLevelGoodsCategoryById(Integer id);
 
 }

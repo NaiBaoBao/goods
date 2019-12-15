@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.goods.mapper.CategoryMapper">
+    <resultMap type="com.example.goods.domain.GoodsCategory" id="GoodsCategory">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="pid" column="pid"/>
+        <result property="gmtCreate" column="gmt_create"/>
+        <result property="gmtModified" column="gmt_modified"/>
+        <result property="picUrl" column="pic_url"/>
+    </resultMap>
+    <select id="getCategoryById" parameterType="integer" resultMap="GoodsCategory">
+        select id,
+               name,
+               pid,
+               gmt_create,
+               gmt_modified,
+               pic_url
+               from oomall_goods_category where id=#{id} and is_deleted=0
+    </select>
+</mapper>

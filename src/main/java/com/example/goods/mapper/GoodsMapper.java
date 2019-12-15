@@ -14,6 +14,7 @@ public interface GoodsMapper {
     public GoodsPo getGoodsById(Integer id);
     public GoodsPo userGetGoodsById(Integer id);
     public List<GoodsPo> getCategoriesInfoById(Integer id);
+    public List<GoodsPo> adminGetCategoriesInfoById(Integer id);
     public List<GoodsPo> listGoods(@Param("goodsSn")String goodsSn,@Param("name")String name);
     public List<GoodsPo> adminListGoods(@Param("goodsSn")String goodsSn,@Param("name")String name);
     public int addGoods(GoodsPo goodsPo);
@@ -21,4 +22,7 @@ public interface GoodsMapper {
     public int deleteGoodsById(Integer id);
     public int nullBrandGoodsPoList(Integer id);
     public int nullCategoryGoodsPoList(Integer id);
+    public List<GoodsPo> getBrandsInfoById(Integer id);
+    public List<GoodsPo> userGetBrandsInfoById(Integer id);
+
 }

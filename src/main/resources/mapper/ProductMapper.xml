@@ -20,14 +20,14 @@
                safety_stock,
                gmt_create,
                gmt_modified
-               from product where goods_id=#{id} and is_deleted=0
+               from oomall_product where goods_id=#{id} and is_deleted=0
     </select>
     <insert id="addProductByGoodsId" parameterType="com.example.goods.domain.ProductPo" useGeneratedKeys="true" keyProperty="id">
-          insert into product (pic_url,specifications,goods_id,price,safety_stock,gmt_create,gmt_modified,is_deleted)
+          insert into oomall_product (pic_url,specifications,goods_id,price,safety_stock,gmt_create,gmt_modified,is_deleted)
           values (#{picUrl},#{specifications},#{goodsId},#{price},#{safetyStock},current_timestamp ,current_timestamp ,0)
     </insert>
     <update id="deleteProductById" parameterType="integer">
-        update product
+        update oomall_product
         set is_deleted=1
         where id=#{id}
     </update>
@@ -40,10 +40,10 @@
                safety_stock,
                gmt_create,
                gmt_modified
-               from product where id=#{id} and is_deleted=0
+               from oomall_product where id=#{id} and is_deleted=0
     </select>
     <update id="updateProductById" parameterType="com.example.goods.domain.ProductPo">
-        update product
+        update oomall_product
         set    pic_url=#{picUrl},
                specifications=#{specifications},
                goods_id=#{goodsId},
@@ -53,7 +53,7 @@
                where id=#{id}
     </update>
     <update id="deleteProductsByGoodsId" parameterType="integer">
-        update product
+        update oomall_product
         set is_deleted=1
         where goods_id=#{id};
     </update>

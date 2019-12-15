@@ -44,7 +44,7 @@
                 special_freight_id,
                 is_special,
                 price
-                from goods where id=#{id} and is_deleted=0
+                from oomall_goods where id=#{id} and is_deleted=0
     </select>
         <select id="userGetGoodsById" parameterType="integer" resultMap="GoodsPo">
         select  id,
@@ -67,7 +67,7 @@
                 special_freight_id,
                 is_special,
                 price
-                from goods where id=#{id} and is_deleted=0 and status!=0
+                from oomall_goods where id=#{id} and is_deleted=0 and status!=0
     </select>
     <select id="getCategoriesInfoById" parameterType="integer" resultMap="GoodsPo">
         select  id,
@@ -90,7 +90,30 @@
                 special_freight_id,
                 is_special,
                 price
-                from goods where goods_category_id=#{id} and is_deleted=0 and status!=0
+                from oomall_goods where goods_category_id=#{id} and is_deleted=0 and status!=0
+    </select>
+    <select id="adminGetCategoriesInfoById" parameterType="integer" resultMap="GoodsPo">
+        select  id,
+                gmt_create,
+                gmt_modified,
+                name,
+                goods_sn,
+                short_name,
+                description,
+                brief,
+                pic_url,
+                detail,
+                status,
+                share_url,
+                gallery,
+                goods_category_id,
+                brand_id,
+                weight,
+                volume,
+                special_freight_id,
+                is_special,
+                price
+                from oomall_goods where goods_category_id=#{id} and is_deleted=0
     </select>
     <select id="listGoods" resultMap="GoodsPo">
         select  id,
@@ -113,7 +136,7 @@
                 special_freight_id,
                 is_special,
                 price
-                from goods
+                from oomall_goods
                 where
                 <if test="name!=null">
                 name=#{name} and
@@ -144,7 +167,7 @@
                 special_freight_id,
                 is_special,
                 price
-                from goods
+                from oomall_goods
                 where
                 <if test="name!=null">
                         name=#{name} and
@@ -155,11 +178,11 @@
                 is_deleted=0
         </select>
         <insert id="addGoods" parameterType="com.example.goods.domain.GoodsPo" useGeneratedKeys="true" keyProperty="id">
-                insert into goods (gmt_create,gmt_modified,name,goods_sn,short_name,description,brief,pic_url,detail,status,share_url,gallery,goods_category_id,brand_id,is_deleted,weight,volume,special_freight_id,is_special,price)
+                insert into oomall_goods (gmt_create,gmt_modified,name,goods_sn,short_name,description,brief,pic_url,detail,status,share_url,gallery,goods_category_id,brand_id,is_deleted,weight,volume,special_freight_id,is_special,price)
                 values (current_timestamp ,current_timestamp,#{name},#{goodsSn},#{shortName},#{description},#{brief},#{picUrl},#{detail},#{statusCode},#{shareUrl},#{gallery},#{goodsCategoryId},#{brandId},0,#{weight},#{volume},#{specialFreightId},#{beSpecial},#{price})
         </insert>
         <update id="updateGoodsById" parameterType="com.example.goods.domain.GoodsPo">
-                update goods
+                update oomall_goods
                 set gmt_modified=current_timestamp ,
                 name=#{name},
                 goods_sn=#{goodsSn},
@@ -181,20 +204,66 @@
                 where id=#{id}
         </update>
         <update id="deleteGoodsById" parameterType="integer">
-                update goods
+                update oomall_goods
                 set is_deleted=1
                 where id=#{id}
         </update>
         <update id="nullBrandGoodsPoList" parameterType="integer">
-                update goods
+                update oomall_goods
                 set brand_id=null ,
                     gmt_modified=current_timestamp
                 where brand_id=#{id}
         </update>
         <update id="nullCategoryGoodsPoList" parameterType="integer">
-                update goods
+                update oomall_goods
                 set goods_category_id=null,
                     gmt_modified=current_timestamp
                 where goods_category_id=#{id}
         </update>
+    <select id="getBrandsInfoById" parameterType="integer" resultMap="GoodsPo">
+        select  id,
+                gmt_create,
+                gmt_modified,
+                name,
+                goods_sn,
+                short_name,
+                description,
+                brief,
+                pic_url,
+                detail,
+                status,
+                share_url,
+                gallery,
+                goods_category_id,
+                brand_id,
+                weight,
+                volume,
+                special_freight_id,
+                is_special,
+                price
+                from oomall_goods where brand_id=#{id} and is_deleted=0
+    </select>
+    <select id="userGetBrandsInfoById" resultMap="GoodsPo">
+        select  id,
+                gmt_create,
+                gmt_modified,
+                name,
+                goods_sn,
+                short_name,
+                description,
+                brief,
+                pic_url,
+                detail,
+                status,
+                share_url,
+                gallery,
+                goods_category_id,
+                brand_id,
+                weight,
+                volume,
+                special_freight_id,
+                is_special,
+                price
+                from oomall_goods where brand_id=#{id} and is_deleted=0 and status!=0
+    </select>
 </mapper>

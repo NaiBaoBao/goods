@@ -9,8 +9,8 @@ import java.util.List;
 @Mapper
 public interface BrandMapper {
     public int deleteBrandById(Integer id);
-    public List<BrandPo> listBrandByCondition();
-    public BrandPo getBrandById(Integer id);
+    public List<BrandPo> listBrandByCondition(Integer id,String name);
+    public BrandPo getBrandPoById(Integer id);
     public int addBrand(BrandPo brandPo);
     public List<BrandPo> listBrand();
     public int updateBrandById(BrandPo brandPo);

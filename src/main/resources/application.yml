@@ -1,8 +1,8 @@
 spring:
   application:
-    name:Goods
+    name: Goods
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/oomall?serverTimezone=UTC
+    url: jdbc:mysql://112.124.5.232:3306/oomall?serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&userSSL=false
     username: root
     password: 12345678
 mybatis:
@@ -16,13 +16,11 @@ pagehelper:
   support-methods-arguments: true
   params: count=countsql
 server:
-  port: 8011
+  port: 8017
 eureka:
   client:
-    register-with-eureka: false
-    fetch-registry: false
-#    serviceUrl:
-#      defaultZone:http://localhost:8080/eureka/
+   serviceUrl:
+      defaultZone: http://112.124.5.232:8011/eureka/
 web:
-  path:/Users/catherinewang/Desktop/picture
+  path: /Users/catherinewang/Desktop/picture
 

@@ -1,13 +1,15 @@
-package com.example.goods.service.serviceImpl;
+package com.example.goods.service.serviceimpl;
 
 import com.example.goods.domain.*;
 import com.example.goods.mapper.*;
 import com.example.goods.service.GoodsService;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
 import java.util.List;
+/**
+ * @author
+ */
 @Service
 public class GoodsServiceImpl implements GoodsService {
     @Resource
@@ -21,7 +23,7 @@ public class GoodsServiceImpl implements GoodsService {
     @Resource
     private CategoryMapper categoryMapper;
     @Resource
-    private BMapper bMapper;
+    private BrMapper brMapper;
 
     @Override
     public List<ProductPo> listProductByGoodsId(Integer id) {
@@ -206,7 +208,7 @@ public class GoodsServiceImpl implements GoodsService {
         GoodsCategoryPo goodsCategoryPo = getGoodsCategoryPoById(id);
         Integer p = goodsCategoryPo.getPid();
         if (p == null)
-            return true;
+            {return true;}
         return false;
     }
     @Override
@@ -223,6 +225,6 @@ public class GoodsServiceImpl implements GoodsService {
     }
     @Override
     public Brand getBrandById(Integer id){
-        return bMapper.getBrandById(id);
+        return brMapper.getBrandById(id);
     }
 }

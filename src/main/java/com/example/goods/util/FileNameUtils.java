@@ -1,5 +1,7 @@
 package com.example.goods.util;
-
+/**
+ * @author
+ */
 public class FileNameUtils {
     /**
      * 获取文件后缀
@@ -16,7 +18,7 @@ public class FileNameUtils {
      * @return
      */
     public static String getFileName(String fileOriginName){
-        return UUIDUtils.getUUID() + FileNameUtils.getSuffix(fileOriginName);
+        return UUIDUtils.getUuid() + FileNameUtils.getSuffix(fileOriginName);
     }
 
 }

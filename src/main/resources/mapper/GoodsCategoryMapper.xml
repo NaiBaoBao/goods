@@ -67,7 +67,7 @@
         set is_deleted=1
         where pid=#{id}
     </update>
-    <select id="getSecondLevelId" parameterType="integer" resultMap="integer">
+    <select id="getSecondLevelId" parameterType="integer" resultType="integer">
         select id
                from oomall_goods_category where pid=#{id}
     </select>

@@ -204,12 +204,15 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
-    public boolean isFirstLevelCategory(Integer id) {
-        GoodsCategoryPo goodsCategoryPo = getGoodsCategoryPoById(id);
-        Integer p = goodsCategoryPo.getPid();
+    public int isFirstLevelCategory(Integer id) {
+        GoodsCategoryPo goodsCategoryPo=goodsCategoryMapper.getGoodsCategoryPoById(id);
+        GoodsCategoryPo goodsCategoryPo1;
+        Integer pid=goodsCategoryPo.getPid();
+        goodsCategoryPo1=goodsCategoryMapper.getGoodsCategoryPoById(pid);
+        Integer p = goodsCategoryPo1.getPid();
         if (p == null)
-            {return true;}
-        return false;
+            {return 1;}
+        return 0;
     }
     @Override
     public List<GoodsPo> getBrandsInfoById(Integer id){

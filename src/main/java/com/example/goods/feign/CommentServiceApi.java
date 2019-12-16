@@ -17,5 +17,5 @@ public interface CommentServiceApi {
      * @return
      */
     @DeleteMapping("/products/{id}/comments")
-    int deletecommentbyproduct(@PathVariable Integer id);
+    String deletecommentbyproduct(@PathVariable Integer id);
 }

@@ -193,12 +193,6 @@ public interface GoodsService {
      */
     List<Integer> getSecondLevelId(Integer id);
 
-    /**
-     * 判断是否是一级分类
-     * @param id
-     * @return
-     */
-    boolean isFirstLevelCategory(Integer id);
 
     /**
      * 获取品牌下的商品
@@ -248,5 +242,12 @@ public interface GoodsService {
      * @return
      */
     List<GoodsCategoryPo> listSecondLevelGoodsCategoryById(Integer id);
+
+    /**
+     * 判断是否是一级分类
+     * @param id
+     * @return
+     */
+    int isFirstLevelCategory(Integer id);
 
 }

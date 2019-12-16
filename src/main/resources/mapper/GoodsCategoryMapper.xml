@@ -34,7 +34,6 @@
     <update id="updateGoodsCategoryById" parameterType="com.example.goods.domain.GoodsCategoryPo">
         update oomall_goods_category
         set name=#{name},
-            pid=#{pid},
             gmt_modified=current_timestamp,
             pic_url=#{picUrl}
             where id=#{id}

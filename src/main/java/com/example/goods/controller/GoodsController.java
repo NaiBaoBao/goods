@@ -51,9 +51,9 @@ public class GoodsController {
      * @param file
      * @return url 图片在服务器上的地址
      */
-    @PostMapping("/pic")
+    @PostMapping("/pics")
     public Object pic(@RequestParam("file") MultipartFile file){
-        String localPath = "/Users/catherinewang/Desktop/picture";
+        String localPath = "/picture";
         String fileName = file.getOriginalFilename();
         String newFile = FileUtils.upload(file,localPath,fileName);
         Object retObj;
@@ -111,6 +111,16 @@ public class GoodsController {
         return retobj;
     }
 
+    /**
+     * 内部接口
+     * @param id
+     * @return
+     */
+    @GetMapping("/products/in/{id}")
+    public ProductPo getProductPoById(@PathVariable(value = "id") Integer id) {
+        return goodsService.getProductById(id);
+    }
+
 
     /**
      * 管理员修改商品下的某个产品信息，删掉了body的注解
@@ -140,8 +150,7 @@ public class GoodsController {
         Object retObi;
         if(productMapper.deleteProductById(id)==1){
             retObi=ResponseUtil.ok();
-            String json = commentServiceApi.deletecommentbyproduct(id);
-            JacksonUtil.parseInteger(json, "data");
+            commentServiceApi.deletecommentbyproduct(id);
         }else {
             retObi=ResponseUtil.serious();
         }
@@ -207,16 +216,44 @@ public class GoodsController {
      *
      *         footprintServiceApi.addFootprint(footprintItemPo);
      */
-//    @GetMapping("goods/{id}")
-//    public Object userGetGoodsById(HttpServletRequest request, @PathVariable(value = "id") Integer id) {
+//    @GetMapping("footprint/in/{id}")
+//    public FootprintItemPo getFootprint(HttpServletRequest request, @PathVariable(value = "id") Integer id) {
 //        String userId = request.getHeader("id");
-//        return goodsService.userGetGoodsById(id);
+//        Integer i=null;
+//        if(userId!=null) {
+//            i = Integer.valueOf(userId);
+//            FootprintItemPo footprintItemPo = new FootprintItemPo();
+//            footprintItemPo.setUserId(i);
+//            footprintItemPo.setGoodsId(id);
+//            return footprintItemPo;
+//        }
+//        return null;
 //    }
+
+    /**
+     *
+     * @param id
+     * @return
+     */
     @GetMapping("goods/{id}")
-    public Object userGetGoodsById(@PathVariable(value = "id") Integer id) {
+    public Object userGetGoodsById(HttpServletRequest request,@PathVariable(value = "id") Integer id) {
         Object retobj;
+        String userId = request.getHeader("id");
+        Integer i=null;
+        if(userId!=null){
+            FootprintItemPo footprintItemPo = new FootprintItemPo();
+            footprintItemPo.setUserId(i);
+            footprintItemPo.setGoodsId(id);
+            footprintServiceApi.addFootprint(footprintItemPo);
+        }
         retobj=ResponseUtil.ok(goodsService.userGetGoodsById(id));
         return retobj;
+    }
+
+    @GetMapping("goods/in/{id}")
+    public GoodsPo getGoodsByIdIn(@PathVariable(value = "id") Integer id) {
+         return goodsService.userGetGoodsById(id);
+
     }
 
 

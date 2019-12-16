@@ -1,5 +1,6 @@
 package com.example.goods.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,8 +32,9 @@ public class BrandPo {
      *品牌图片链接
      */
     private String picUrl;
-
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime gmtCreate;
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime gmtModified;
     private Boolean beDeleted;
 

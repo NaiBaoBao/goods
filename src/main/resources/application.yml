@@ -2,9 +2,21 @@ spring:
   application:
     name: Goods
   datasource:
-    url: jdbc:mysql://localhost:3306/oomall?serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&userSSL=false
+    url: jdbc:mysql://112.124.5.232:3306/oomall?serverTimezone=UTC&useSSL=false&useUnicode=true&characterEncoding=UTF-8
     username: root
     password: 12345678
+    driver-class-name: com.mysql.jdbc.Driver
+  redis:
+    host: 112.124.5.232
+    port: 6379
+    database: 0
+    jedis:
+      pool:
+        max-active: 50
+        max-wait: 3000
+        max-idle: 20
+        min-idle: 2
+    timeout: 10000
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   configuration:
@@ -17,10 +29,12 @@ pagehelper:
   params: count=countsql
 server:
   port: 8017
-#eureka:
-#  client:
-#   serviceUrl:
-#      defaultZone: http://localhost:8011/eureka/
+eureka:
+  client:
+   serviceUrl:
+      defaultZone: http://112.124.5.232:8011/eureka/
 web:
-  path: /Users/catherinewang/Desktop/picture
+  path: /picture
+goods:
+  redisExpireTime: 1
 

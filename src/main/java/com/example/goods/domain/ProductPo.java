@@ -1,5 +1,6 @@
 package com.example.goods.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -44,8 +45,9 @@ public class ProductPo {
      * 产品安全库存
      */
     private Integer safetyStock;
-
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime gmtCreate;
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime gmtModified;
     private Boolean beDeleted;
 

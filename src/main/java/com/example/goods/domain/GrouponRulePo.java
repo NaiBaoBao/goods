@@ -1,5 +1,6 @@
 package com.example.goods.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,10 +22,12 @@ public class GrouponRulePo {
     /**
      * 团购开始时间
      */
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime startTime;
     /**
      * 团购结束时间
      */
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime endTime;
     /**
      * 判断团购是否还在进行中
@@ -39,8 +42,9 @@ public class GrouponRulePo {
      * 团购商品id
      */
     private Integer goodsId;
-
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime gmtCreate;
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime gmtModified;
     private Boolean beDeleted;
 }

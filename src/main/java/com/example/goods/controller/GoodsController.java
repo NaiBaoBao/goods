@@ -46,24 +46,24 @@ public class GoodsController {
     @Value("${web.path}")
     private String path;
     /**
-     * 上传图片到服务器 返回图片地址
+     * 上传图片到服务器 返回图片地址 删掉了
      *
      * @param file
      * @return url 图片在服务器上的地址
      */
-    @PostMapping("/pics")
-    public Object pic(@RequestParam("file") MultipartFile file){
-        String localPath = "/picture";
-        String fileName = file.getOriginalFilename();
-        String newFile = FileUtils.upload(file,localPath,fileName);
-        Object retObj;
-        if(newFile != null){
-            retObj = ResponseUtil.ok(localPath+"\\"+newFile);
-        }else{
-            retObj = fail(502,"图片上传失败");
-        }
-        return retObj;
-    }
+//    @PostMapping("/pics")
+//    public Object pic(@RequestParam("file") MultipartFile file){
+//        String localPath = "/picture";
+//        String fileName = file.getOriginalFilename();
+//        String newFile = FileUtils.upload(file,localPath,fileName);
+//        Object retObj;
+//        if(newFile != null){
+//            retObj = ResponseUtil.ok(localPath+"\\"+newFile);
+//        }else{
+//            retObj = fail(502,"图片上传失败");
+//        }
+//        return retObj;
+//    }
 
 
     /**
@@ -141,7 +141,7 @@ public class GoodsController {
 
     /**
      * 管理员删除商品下的某个产品信息，还要实现调用comment删除的内部接口
-     *?????????????????????????????????????????????????
+     *
      * @param id
      * @return 无（ResponseUtil.ok()即可
      */
@@ -198,7 +198,7 @@ public class GoodsController {
      * @param id
      * @return GoodsVo，即商品的信息，此URL与WX端是同一个URL
      */
-    @GetMapping("admin/goods/{id}")
+    @GetMapping("/admin/goods/{id}")
     public Object getGoodsById(@PathVariable(value = "id") Integer id) {
         Object retobj;
         retobj=ResponseUtil.ok(goodsService.getGoodsById(id));
@@ -230,12 +230,12 @@ public class GoodsController {
 //        return null;
 //    }
 
-    /**
+    /**用户根据id获取某个商品，调用足迹
      *
      * @param id
      * @return
      */
-    @GetMapping("goods/{id}")
+    @GetMapping("/goods/{id}")
     public Object userGetGoodsById(HttpServletRequest request,@PathVariable(value = "id") Integer id) {
         Object retobj;
         String userId = request.getHeader("id");
@@ -250,7 +250,7 @@ public class GoodsController {
         return retobj;
     }
 
-    @GetMapping("goods/in/{id}")
+    @GetMapping("/goods/in/{id}")
     public GoodsPo getGoodsByIdIn(@PathVariable(value = "id") Integer id) {
          return goodsService.userGetGoodsById(id);
 
@@ -291,7 +291,7 @@ public class GoodsController {
     }
 
     /**
-     * 根据id删除商品信息
+     * 根据id删除商品信息，只能删除下架的商品
      *
      * @param id
      * @return 无（即ResponseUtil.ok()即可）
@@ -299,21 +299,27 @@ public class GoodsController {
     @DeleteMapping("/goods/{id}")
     public Object deleteGoodsById(@PathVariable Integer id) {
         Object retObi;
-        if(goodsMapper.deleteGoodsById(id)==1){
-            goodsService.deleteProductsByGoodsId(id);
-            retObi=ResponseUtil.ok();
+        GoodsPo goodsPo=goodsService.getGoodsById(id);
+        if(goodsPo.getStatusCode()==0){
+            if(goodsMapper.deleteGoodsById(id)==1){
+                goodsService.deleteProductsByGoodsId(id);
+                retObi=ResponseUtil.ok();
+            }else {
+                retObi=ResponseUtil.serious();
+            }
         }else {
-            retObi=ResponseUtil.serious();
+            retObi=ResponseUtil.badArgumentValue();
         }
+
         return retObi;
     }
     /**
-     * 管理员根据品牌id查询商品
+     * 管理员根据品牌id查询商品，删掉了
      *
      * @param id
      * @return List<GoodsVo>
      */
-    @GetMapping("/admins/brands/{id}/goods")
+    @GetMapping("/admin/brands/{id}/goods")
     public Object getBrandsInfoById(@PathVariable(value = "id")Integer id){
         Object retobj;
         retobj=ResponseUtil.ok(goodsService.getBrandsInfoById(id));
@@ -333,7 +339,7 @@ public class GoodsController {
     }
     /**
      * 用户获取分类下的商品信息，判断是一级分类还是二级分类，一级分类要返回"是一级分类"
-     * @param id ?????????????????????????????????????????????????
+     * @param id
      * @return
      */
     @GetMapping("/categories/{id}/goods")
@@ -357,31 +363,32 @@ public class GoodsController {
         return retobj;
     }
 
-    /**
-     * 管理员获取分类下的商品信息，判断是一级分类还是二级分类，一级分类要返回"是一级分类"
-     * @param id
-     * @return
-     */
-    @GetMapping("/admins/categories/{id}/goods")
-    public Object adminGetCategoriesInfoById(@PathVariable(value = "id")Integer id,
-                                        @RequestParam(defaultValue = "1") Integer page,
-                                        @RequestParam(defaultValue = "10") Integer limit) {
-        Object retobj=new Object();
-        GoodsCategoryPo goodsCategoryPo=goodsService.getGoodsCategoryPoById(id);
-        //id是分类的id，pid是此分类的父分类id
-        Integer pid=goodsCategoryPo.getPid();
-        if(pid==null){//一级分类
-            retobj=ResponseUtil.badArgumentValue();
-        }
-        else if(pid!=null){//二级分类
-            PageHelper.startPage(page,limit);
-            List<GoodsPo> goodsList = goodsService.adminGetCategoriesInfoById(id);
-            PageInfo<GoodsPo> goodsPageInfo = new PageInfo<>(goodsList);
-            List<GoodsPo> pagelist =goodsPageInfo.getList();
-            retobj=ResponseUtil.ok(pagelist);
-        }
-        return retobj;
-    }
+//    /**
+//     * 管理员获取分类下的商品信息，判断是一级分类还是二级分类，一级分类要返回"是一级分类"
+//     *删掉了
+//     * @param id
+//     * @return
+//     */
+//    @GetMapping("/admin/categories/{id}/goods")
+//    public Object adminGetCategoriesInfoById(@PathVariable(value = "id")Integer id,
+//                                        @RequestParam(defaultValue = "1") Integer page,
+//                                        @RequestParam(defaultValue = "10") Integer limit) {
+//        Object retobj=new Object();
+//        GoodsCategoryPo goodsCategoryPo=goodsService.getGoodsCategoryPoById(id);
+//        //id是分类的id，pid是此分类的父分类id
+//        Integer pid=goodsCategoryPo.getPid();
+//        if(pid==null){//一级分类
+//            retobj=ResponseUtil.badArgumentValue();
+//        }
+//        else if(pid!=null){//二级分类
+//            PageHelper.startPage(page,limit);
+//            List<GoodsPo> goodsList = goodsService.adminGetCategoriesInfoById(id);
+//            PageInfo<GoodsPo> goodsPageInfo = new PageInfo<>(goodsList);
+//            List<GoodsPo> pagelist =goodsPageInfo.getList();
+//            retobj=ResponseUtil.ok(pagelist);
+//        }
+//        return retobj;
+//    }
 
     /**
      * 用户根据条件搜索商品，上架
@@ -435,7 +442,7 @@ public class GoodsController {
      * @param limit
      * @return
      */
-    @GetMapping("/admins/brands")
+    @GetMapping("/admin/brands")
     public Object listBrandByCondition(@RequestParam Integer id,@RequestParam String name,
                                             @RequestParam(defaultValue = "1") Integer page,
                                             @RequestParam(defaultValue = "10") Integer limit) {
@@ -694,7 +701,7 @@ public class GoodsController {
      * @param id 分类类目ID
      * @return 当前分类栏目
      */
-    @GetMapping("categories/l1/{id}/l2")
+    @GetMapping("/categories/l1/{id}/l2")
     public Object listSecondLevelGoodsCategoryById(@PathVariable Integer id) {
         Object retobj;
         retobj=ResponseUtil.ok(goodsService.listSecondLevelGoodsCategoryById(id));
@@ -712,6 +719,26 @@ public class GoodsController {
         if(goodsPo.getStatusCode()==0){
             return false;
         }
+        return true;
+    }
+
+    /**传递productId，扣除库存，内部接口
+     *
+     * @param id productId
+     * @param quantity
+     * @return
+     */
+
+    @PutMapping("/goods/{id}/deduct")
+    public boolean deduct(@PathVariable Integer id,@RequestParam Integer quantity){
+        ProductPo productPo=new ProductPo();
+        productPo=goodsService.getProductById(id);
+        Integer stockb=productPo.getSafetyStock();
+        Integer stocka=stockb-quantity;
+        if(stocka<0){
+            return false;
+        }
+        productPo.setSafetyStock(stocka);
         return true;
     }
 

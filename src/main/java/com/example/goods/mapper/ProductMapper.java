@@ -51,4 +51,5 @@ public interface ProductMapper {
      * @return
      */
     public int deleteProductsByGoodsId(Integer id);
+
 }

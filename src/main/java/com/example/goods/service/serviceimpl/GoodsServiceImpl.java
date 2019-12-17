@@ -67,8 +67,8 @@ public class GoodsServiceImpl implements GoodsService {
 
 
     @Override
-    public List<GoodsPo> listGoods(String goodsSn, String name) {
-        return goodsMapper.listGoods(goodsSn, name);
+    public List<GoodsPo> listGoods(String name) {
+        return goodsMapper.listGoods(name);
     }
 
     @Override

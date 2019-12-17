@@ -42,11 +42,11 @@ public interface GoodsMapper {
     /**
      * 用户根据条件搜索商品，上架
      *
-     * @param goodsSn 商品的序列号
+     *
      * @param name 商品的名字
      * @return
      */
-    public List<GoodsPo> listGoods(@Param("goodsSn")String goodsSn,@Param("name")String name);
+    public List<GoodsPo> listGoods(@Param("name")String name);
     /**
      * 管理员根据条件搜索商品
      *

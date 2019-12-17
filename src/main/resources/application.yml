@@ -1,6 +1,6 @@
 spring:
   application:
-    name: Goods
+    name: goodsInfoService
   datasource:
     url: jdbc:mysql://112.124.5.232:3306/oomall?serverTimezone=UTC&useSSL=false&useUnicode=true&characterEncoding=UTF-8
     username: root

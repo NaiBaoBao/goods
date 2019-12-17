@@ -3,6 +3,7 @@ package com.example.goods.controller;
 import com.example.goods.domain.*;
 import com.example.goods.feign.CommentServiceApi;
 import com.example.goods.feign.FootprintServiceApi;
+import com.example.goods.feign.LogServiceApi;
 import com.example.goods.mapper.*;
 import com.example.goods.service.GoodsService;
 import com.example.goods.util.FileUtils;
@@ -26,7 +27,7 @@ import static com.example.goods.util.ResponseUtil.fail;
  * @author
  */
 @RestController
-@RequestMapping("/goodsService")
+@RequestMapping("/goodsInfoService")
 public class GoodsController {
     @Autowired
     private GoodsService goodsService;
@@ -34,6 +35,8 @@ public class GoodsController {
     FootprintServiceApi footprintServiceApi;
     @Autowired
     CommentServiceApi commentServiceApi;
+    @Autowired
+    LogServiceApi logServiceApi;
     @Resource
     BrandMapper brandMapper;
     @Resource
@@ -69,14 +72,30 @@ public class GoodsController {
     /**
      * 管理员查询商品下的产品，可看下架
      *
+     * 查找的时候也会失败，比如传参id《=0
+     * 每一条管理员的操作都要加：
+     * Log log=new Log();
+     * log.setActions();//里面是本条的操作
+     * log.setType();//这个我们自己组定义一下，0查找，1增加，2修改，3删除
+     * 结合错误码，log.setStatusCode();//0为操作失败，1为操作成功
      * @param id
      * @return List<ProductVo>，所属该商品的产品列表
      */
 
     @GetMapping("/goods/{id}/products")
     public Object listProductByGoodsId(@PathVariable(value = "id") Integer id) {
+        Log log=new Log();
+        log.setActions("查找商品下货品");
+        log.setType(0);
         Object retobj;
-        retobj=ResponseUtil.ok(goodsService.listProductByGoodsId(id));
+        if(id<=0){
+            log.setStatusCode(0);
+            retobj=ResponseUtil.badArgumentValue();
+        }else {
+            log.setStatusCode(1);
+            retobj=ResponseUtil.ok(goodsService.listProductByGoodsId(id));
+        }
+        logServiceApi.addLog(log);
         return retobj;
     }
 
@@ -89,27 +108,38 @@ public class GoodsController {
     @PostMapping("/goods/{id}/products")
     public Object addProductByGoodsId(@PathVariable Integer id,ProductPo productVo) {
         Object retobj;
-        productVo.setGoodsId(id);
-        if(productMapper.addProductByGoodsId(productVo)==1){
-            retobj=ResponseUtil.ok(goodsService.getProductById(productVo.getId()));
+        Log log=new Log();
+        log.setActions("添加商品下产品");
+        log.setType(1);
+        if(id<=0){
+            log.setStatusCode(0);
+            retobj=ResponseUtil.badArgumentValue();
         }else {
-            retobj=ResponseUtil.updatedDataFailed();
+            productVo.setGoodsId(id);
+            if(productMapper.addProductByGoodsId(productVo)==1){
+                retobj=ResponseUtil.ok(goodsService.getProductById(productVo.getId()));
+                log.setStatusCode(1);
+            }else {
+                retobj=ResponseUtil.updatedDataFailed();
+                log.setStatusCode(0);
+            }
         }
+        logServiceApi.addLog(log);
         return retobj;
     }
 
-    /**
-     * 根据id获得产品对象
-     *
-     * @param id
-     * @return
-     */
-    @GetMapping("/products/{id}")
-    public Object getProductById(@PathVariable(value = "id") Integer id) {
-        Object retobj;
-        retobj=ResponseUtil.ok(goodsService.getProductById(id));
-        return retobj;
-    }
+//    /**
+//     * 根据id获得产品对象，删了
+//     *
+//     * @param id
+//     * @return
+//     */
+//    @GetMapping("/products/{id}")
+//    public Object getProductById(@PathVariable(value = "id") Integer id) {
+//        Object retobj;
+//        retobj=ResponseUtil.ok(goodsService.getProductById(id));
+//        return retobj;
+//    }
 
     /**
      * 内部接口
@@ -129,13 +159,24 @@ public class GoodsController {
      * @return
      */
     @PutMapping("/products/{id}")
-    public Object updateProductById(@PathVariable Integer id, ProductPo productPo) {
+    public Object updateProductById(@PathVariable Integer id, @RequestBody ProductPo productPo) {
         Object retobj;
-        if(productMapper.updateProductById(productPo)==1){
-            retobj=ResponseUtil.ok(goodsService.getProductById(id));
+        Log log=new Log();
+        log.setActions("修改商品下产品");
+        log.setType(2);
+        if(id<=0){
+            log.setStatusCode(0);
+            retobj=ResponseUtil.badArgumentValue();
         }else {
-            retobj=ResponseUtil.updatedDataFailed();
+            if(productMapper.updateProductById(productPo)==1){
+                retobj=ResponseUtil.ok(goodsService.getProductById(id));
+                log.setStatusCode(1);
+            }else {
+                retobj=ResponseUtil.updatedDataFailed();
+                log.setStatusCode(0);
+            }
         }
+        logServiceApi.addLog(log);
         return retobj;
     }
 
@@ -148,12 +189,23 @@ public class GoodsController {
     @DeleteMapping("/products/{id}")
     public Object deleteProductById(@PathVariable Integer id) {
         Object retObi;
-        if(productMapper.deleteProductById(id)==1){
-            retObi=ResponseUtil.ok();
-            commentServiceApi.deletecommentbyproduct(id);
+        Log log=new Log();
+        log.setActions("删除商品下产品");
+        log.setType(3);
+        if(id<=0){
+            log.setStatusCode(0);
+            retObi=ResponseUtil.badArgumentValue();
         }else {
-            retObi=ResponseUtil.serious();
+            if(productMapper.deleteProductById(id)==1){
+                retObi=ResponseUtil.ok();
+                commentServiceApi.deletecommentbyproduct(id);
+                log.setStatusCode(1);
+            }else {
+                retObi=ResponseUtil.serious();
+                log.setStatusCode(0);
+            }
         }
+        logServiceApi.addLog(log);
         return retObi;
     }
 
@@ -164,31 +216,40 @@ public class GoodsController {
      * @return Goods，即新建的一个商品
      */
     @PostMapping("/goods")
-    public Object addGoods( GoodsPo goodsPo) {
+    public Object addGoods(@RequestBody GoodsPo goodsPo) {
         Object retobj=new Object();
+        Log log=new Log();
+        log.setActions("新建商品");
+        log.setType(1);
         Integer cid=goodsPo.getGoodsCategoryId();//cid是商品分类id
         Integer id=goodsPo.getId();//id是商品id
         //无分类商品，正常新建
         if(cid==null){
             if(goodsMapper.addGoods(goodsPo)==1) {
                 retobj=ResponseUtil.ok(goodsService.getGoodsById(id));
+                log.setStatusCode(1);
             }else {
                 retobj=ResponseUtil.serious();
+                log.setStatusCode(0);
             }
         }else {//有分类商品，Po是其分类
             GoodsCategoryPo goodsCategoryPo=goodsService.getGoodsCategoryPoById(cid);
             if(goodsCategoryPo.getPid()==null) {//错误建在一级分类下
                 retobj=ResponseUtil.badArgumentValue();
+                log.setStatusCode(0);
             }
             else if(goodsCategoryPo.getPid()!=null){//建在了二级分类下，正常新建
                 if(goodsMapper.addGoods(goodsPo)==1) {
                     retobj=ResponseUtil.ok(goodsService.getGoodsById(id));
+                    log.setStatusCode(1);
                 }else {
                     retobj=ResponseUtil.serious();
+                    log.setStatusCode(0);
                 }
             }
         }
-            return retobj;
+        logServiceApi.addLog(log);
+        return retobj;
     }
 
 
@@ -201,7 +262,17 @@ public class GoodsController {
     @GetMapping("/admin/goods/{id}")
     public Object getGoodsById(@PathVariable(value = "id") Integer id) {
         Object retobj;
-        retobj=ResponseUtil.ok(goodsService.getGoodsById(id));
+        Log log=new Log();
+        log.setActions("根据id获得商品");
+        log.setType(0);
+        if(id<=0){
+            retobj=ResponseUtil.badArgumentValue();
+            log.setStatusCode(0);
+        }else {
+            log.setStatusCode(1);
+            retobj=ResponseUtil.ok(goodsService.getGoodsById(id));
+        }
+        logServiceApi.addLog(log);
         return retobj;
     }
 
@@ -233,24 +304,34 @@ public class GoodsController {
     /**用户根据id获取某个商品，调用足迹
      *
      * @param id
-     * @return
+     * @return Goods
      */
     @GetMapping("/goods/{id}")
     public Object userGetGoodsById(HttpServletRequest request,@PathVariable(value = "id") Integer id) {
         Object retobj;
         String userId = request.getHeader("id");
         Integer i=null;
-        if(userId!=null){
-            FootprintItemPo footprintItemPo = new FootprintItemPo();
-            footprintItemPo.setUserId(i);
-            footprintItemPo.setGoodsId(id);
-            footprintServiceApi.addFootprint(footprintItemPo);
+        if(id<=0){
+            retobj=ResponseUtil.badArgumentValue();
+        }else {
+            if (userId != null) {
+                FootprintItemPo footprintItemPo = new FootprintItemPo();
+                i = Integer.valueOf(userId);
+                footprintItemPo.setUserId(i);
+                footprintItemPo.setGoodsId(id);
+                footprintServiceApi.addFootprint(footprintItemPo);
+            }
+            retobj = ResponseUtil.ok(goodsService.userGetGoodsById(id));
         }
-        retobj=ResponseUtil.ok(goodsService.userGetGoodsById(id));
         return retobj;
     }
 
-    @GetMapping("/goods/in/{id}")
+    /**
+     * 内部接口
+     * @param id
+     * @return
+     */
+    @GetMapping("/goodsPo/{id}")
     public GoodsPo getGoodsByIdIn(@PathVariable(value = "id") Integer id) {
          return goodsService.userGetGoodsById(id);
 
@@ -267,26 +348,40 @@ public class GoodsController {
     @PutMapping("/goods/{id}")
     public Object updateGoodsById(@PathVariable Integer id, GoodsPo goodsPo) {
         Object retobj=new Object();
-        Integer cid=goodsPo.getGoodsCategoryId();
-        if(cid==null){//更改后是无分类商品
-            if(goodsMapper.updateGoodsById(goodsPo)==1){
-                retobj=ResponseUtil.ok(goodsService.getGoodsById(id));
-            }else {
-                retobj=ResponseUtil.updatedDataFailed();
-            }
-        }else if(cid!=null){//更改后是有分类商品
-            GoodsCategoryPo goodsCategoryPo=goodsService.getGoodsCategoryPoById(cid);
-            if(goodsCategoryPo.getPid()==null) {//错误更改在一级分类下
-                retobj=ResponseUtil.badArgumentValue();
-            }
-            else if(goodsCategoryPo.getPid()!=null){//正常更改在二级分类下
-                if(goodsMapper.updateGoodsById(goodsPo)==1) {
+        Log log=new Log();
+        log.setActions("修改商品");
+        log.setType(2);
+        if(id<=0){
+            log.setStatusCode(0);
+            retobj=ResponseUtil.badArgumentValue();
+        }else {
+            Integer cid=goodsPo.getGoodsCategoryId();
+            if(cid==null){//更改后是无分类商品
+                if(goodsMapper.updateGoodsById(goodsPo)==1){
                     retobj=ResponseUtil.ok(goodsService.getGoodsById(id));
+                    log.setStatusCode(1);
                 }else {
-                    retobj=ResponseUtil.serious();
+                    retobj=ResponseUtil.updatedDataFailed();
+                    log.setStatusCode(0);
+                }
+            }else if(cid!=null){//更改后是有分类商品
+                GoodsCategoryPo goodsCategoryPo=goodsService.getGoodsCategoryPoById(cid);
+                if(goodsCategoryPo.getPid()==null) {//错误更改在一级分类下
+                    retobj=ResponseUtil.badArgumentValue();
+                    log.setStatusCode(0);
+                }
+                else if(goodsCategoryPo.getPid()!=null){//正常更改在二级分类下
+                    if(goodsMapper.updateGoodsById(goodsPo)==1) {
+                        retobj=ResponseUtil.ok(goodsService.getGoodsById(id));
+                        log.setStatusCode(1);
+                    }else {
+                        retobj=ResponseUtil.serious();
+                        log.setStatusCode(0);
+                    }
                 }
             }
         }
+        logServiceApi.addLog(log);
         return retobj;
     }
 
@@ -299,18 +394,29 @@ public class GoodsController {
     @DeleteMapping("/goods/{id}")
     public Object deleteGoodsById(@PathVariable Integer id) {
         Object retObi;
-        GoodsPo goodsPo=goodsService.getGoodsById(id);
-        if(goodsPo.getStatusCode()==0){
-            if(goodsMapper.deleteGoodsById(id)==1){
-                goodsService.deleteProductsByGoodsId(id);
-                retObi=ResponseUtil.ok();
-            }else {
-                retObi=ResponseUtil.serious();
-            }
-        }else {
+        Log log=new Log();
+        log.setActions("删除下架商品");
+        log.setType(3);
+        if(id<=0){
+            log.setStatusCode(0);
             retObi=ResponseUtil.badArgumentValue();
+        }else {
+            GoodsPo goodsPo=goodsService.getGoodsById(id);
+            if(goodsPo.getStatusCode()==0){
+                if(goodsMapper.deleteGoodsById(id)==1){
+                    goodsService.deleteProductsByGoodsId(id);
+                    retObi=ResponseUtil.ok();
+                    log.setStatusCode(1);
+                }else {
+                    retObi=ResponseUtil.serious();
+                    log.setStatusCode(0);
+                }
+            }else {
+                retObi=ResponseUtil.badArgumentValue();
+                log.setStatusCode(0);
+            }
         }
-
+        logServiceApi.addLog(log);
         return retObi;
     }
     /**
@@ -321,12 +427,22 @@ public class GoodsController {
      */
     @GetMapping("/admin/brands/{id}/goods")
     public Object getBrandsInfoById(@PathVariable(value = "id")Integer id){
+        Log log=new Log();
+        log.setActions("根据品牌id查商品");
+        log.setType(0);
         Object retobj;
-        retobj=ResponseUtil.ok(goodsService.getBrandsInfoById(id));
+        if(id<=0){
+            log.setStatusCode(0);
+            retobj=ResponseUtil.badArgumentValue();
+        }else {
+            log.setStatusCode(1);
+            retobj=ResponseUtil.ok(goodsService.getBrandsInfoById(id));
+        }
+        logServiceApi.addLog(log);
         return retobj;
     }
     /**
-     * 用户根据品牌id查询商品
+     * 用户根据品牌id查询商品,上架
      *
      * @param id
      * @return List<GoodsVo>
@@ -347,18 +463,22 @@ public class GoodsController {
                                         @RequestParam(defaultValue = "1") Integer page,
                                         @RequestParam(defaultValue = "10") Integer limit) {
         Object retobj=new Object();
-        GoodsCategoryPo goodsCategoryPo=goodsService.getGoodsCategoryPoById(id);
-        //id是分类的id，pid是此分类的父分类id
-        Integer pid=goodsCategoryPo.getPid();
-        if(pid==null){//一级分类
+        if(id<=0){
             retobj=ResponseUtil.badArgumentValue();
-        }
-        else if(pid!=null){//二级分类
-            PageHelper.startPage(page,limit);
-            List<GoodsPo> goodsList = goodsService.getCategoriesInfoById(id);
-            PageInfo<GoodsPo> goodsPageInfo = new PageInfo<>(goodsList);
-            List<GoodsPo> pagelist =goodsPageInfo.getList();
-            retobj=ResponseUtil.ok(pagelist);
+        }else {
+            GoodsCategoryPo goodsCategoryPo=goodsService.getGoodsCategoryPoById(id);
+            //id是分类的id，pid是此分类的父分类id
+            Integer pid=goodsCategoryPo.getPid();
+            if(pid==null){//一级分类
+                retobj=ResponseUtil.badArgumentValue();
+            }
+            else if(pid!=null){//二级分类
+                PageHelper.startPage(page,limit);
+                List<GoodsPo> goodsList = goodsService.getCategoriesInfoById(id);
+                PageInfo<GoodsPo> goodsPageInfo = new PageInfo<>(goodsList);
+                List<GoodsPo> pagelist =goodsPageInfo.getList();
+                retobj=ResponseUtil.ok(pagelist);
+            }
         }
         return retobj;
     }
@@ -393,19 +513,19 @@ public class GoodsController {
     /**
      * 用户根据条件搜索商品，上架
      *
-     * @param goodsSn 商品的序列号
+     *
      * @param name 商品的名字
      * @param page  第几页
      * @param limit 一页多少
      * @return
      */
     @GetMapping("/goods")
-    public Object listGoods(String goodsSn, String name,
+    public Object listGoods(@RequestParam String name,
                                  @RequestParam(defaultValue = "1") Integer page,
                                  @RequestParam(defaultValue = "10") Integer limit){
         Object retobj;
         PageHelper.startPage(page,limit);
-        List<GoodsPo> goodsList = goodsService.listGoods(goodsSn,name);
+        List<GoodsPo> goodsList = goodsService.listGoods(name);
         PageInfo<GoodsPo> goodsPageInfo = new PageInfo<>(goodsList);
         List<GoodsPo> pagelist =goodsPageInfo.getList();
         retobj=ResponseUtil.ok(pagelist);
@@ -422,15 +542,20 @@ public class GoodsController {
      * @return
      */
     @GetMapping("/admin/goods")
-    public Object adminListGoods(String goodsSn, String name,
+    public Object adminListGoods(@RequestParam String goodsSn, @RequestParam String name,
                                    @RequestParam(defaultValue = "1") Integer page,
                                    @RequestParam(defaultValue = "10") Integer limit){
         Object retobj;
+        Log log=new Log();
+        log.setActions("条件搜索商品");
+        log.setType(0);
         PageHelper.startPage(page,limit);
         List<GoodsPo> goodsList = goodsService.adminListGoods(goodsSn,name);
         PageInfo<GoodsPo> goodsPageInfo = new PageInfo<>(goodsList);
         List<GoodsPo> pagelist =goodsPageInfo.getList();
         retobj=ResponseUtil.ok(pagelist);
+        log.setStatusCode(1);
+        logServiceApi.addLog(log);
         return retobj;
     }
 
@@ -446,12 +571,22 @@ public class GoodsController {
     public Object listBrandByCondition(@RequestParam Integer id,@RequestParam String name,
                                             @RequestParam(defaultValue = "1") Integer page,
                                             @RequestParam(defaultValue = "10") Integer limit) {
+        Log log=new Log();
+        log.setActions("根据条件搜索品牌");
+        log.setType(0);
         Object retobj;
-        PageHelper.startPage(page,limit);
-        List<BrandPo> brandList = goodsService.listBrandByCondition(id,name);
-        PageInfo<BrandPo> brandPageInfo = new PageInfo<>(brandList);
-        List<BrandPo> pagelist =brandPageInfo.getList();
-        retobj=ResponseUtil.ok(pagelist);
+        if(id<=0){
+            log.setStatusCode(0);
+            retobj=ResponseUtil.badArgumentValue();
+        }
+        else {
+            PageHelper.startPage(page,limit);
+            List<BrandPo> brandList = goodsService.listBrandByCondition(id,name);
+            PageInfo<BrandPo> brandPageInfo = new PageInfo<>(brandList);
+            List<BrandPo> pagelist =brandPageInfo.getList();
+            retobj=ResponseUtil.ok(pagelist);
+        }
+        logServiceApi.addLog(log);
         return retobj;
     }
 
@@ -463,40 +598,61 @@ public class GoodsController {
      * @return brandPo
      */
     @PostMapping("/brands")
-    public Object addBrand(BrandPo brandPo) {
+    public Object addBrand(@RequestBody BrandPo brandPo) {
         Object retobj;
+        Log log=new Log();
+        log.setActions("创建品牌");
+        log.setType(1);
         if(brandMapper.addBrand(brandPo)==1){
             retobj=ResponseUtil.ok(goodsService.getBrandPoById(brandPo.getId()));
+            log.setStatusCode(1);
         }else {
             retobj=ResponseUtil.updatedDataFailed();
+            log.setStatusCode(0);
         }
+        logServiceApi.addLog(log);
         return retobj;
     }
 
     /**
-     * 用户和管理员查看品牌详情,此API与商城端/brands/{id}完全相同
+     * 管理员查看品牌详情
      *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * @param id
      * @return
      */
-    @GetMapping("/brands/{id}")
+    @GetMapping("/admin/brands/{id}")
     public Object adminGetBrandById(@PathVariable Integer id) {
         Object retobj;
-        retobj=ResponseUtil.ok(goodsService.getBrandPoById(id));
+        Log log=new Log();
+        log.setActions("查看品牌");
+        log.setType(0);
+        if(id<=0) {
+            log.setStatusCode(0);
+            retobj = ResponseUtil.badArgumentValue();
+        }else {
+            log.setStatusCode(1);
+            retobj=ResponseUtil.ok(goodsService.getBrandPoById(id));
+        }
+        logServiceApi.addLog(log);
         return retobj;
     }
 
-//    /**
-//     *用户和管理员查看品牌详情,此API与商城端/brands/{id}完全相同
-//     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//     * @param id
-//     * @return
-//     */
-//    @GetMapping("users/brands/{id}")
-//    public Object userGetBrandPoById(@PathVariable Integer id) {
-//        BrandPo brandPo=goodsService.getBrandPoById(id);
-//        return brandPo;
-//    }
+    /**
+     *用户查看品牌详情
+     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     * @param id
+     * @return
+     */
+    @GetMapping("/brands/{id}")
+    public Object userGetBrandPoById(@PathVariable Integer id) {
+        Object retobj;
+        if(id<=0){
+            retobj=ResponseUtil.badArgumentValue();
+        }else {
+            retobj=ResponseUtil.ok(goodsService.getBrandPoById(id));
+        }
+        return retobj;
+    }
 
     /**
      * 修改单个品牌的信息，删掉了body注解
@@ -508,11 +664,22 @@ public class GoodsController {
     @PutMapping("/brands/{id}")
     public Object updateBrandById(@PathVariable Integer id,BrandPo brandPo) {
         Object retobj;
-        if(brandMapper.updateBrandById(brandPo)==1){
-            retobj=ResponseUtil.ok(goodsService.getBrandPoById(id));
+        Log log=new Log();
+        log.setActions("修改品牌");
+        log.setType(2);
+        if(id<=0){
+            log.setStatusCode(0);
+            retobj=ResponseUtil.badArgumentValue();
         }else {
-            retobj=ResponseUtil.updatedDataFailed();
+            if(brandMapper.updateBrandById(brandPo)==1){
+                retobj=ResponseUtil.ok(goodsService.getBrandPoById(id));
+                log.setStatusCode(1);
+            }else {
+                retobj=ResponseUtil.updatedDataFailed();
+                log.setStatusCode(0);
+            }
         }
+        logServiceApi.addLog(log);
         return retobj;
     }
 
@@ -526,17 +693,49 @@ public class GoodsController {
     @DeleteMapping("/brands/{id}")
     public Object deleteBrandById(@PathVariable(value = "id")Integer id) {
         Object retObi;
-        if(brandMapper.deleteBrandById(id)==1){
-            goodsService.nullBrandGoodsPoList(id);
-            retObi=ResponseUtil.ok();
+        Log log=new Log();
+        log.setActions("删除品牌");
+        log.setType(3);
+        if(id<=0){
+            log.setStatusCode(0);
+            retObi=ResponseUtil.badArgumentValue();
         }else {
-            retObi=ResponseUtil.serious();
+            if(brandMapper.deleteBrandById(id)==1){
+                goodsService.nullBrandGoodsPoList(id);
+                retObi=ResponseUtil.ok();
+                log.setStatusCode(1);
+            }else {
+                retObi=ResponseUtil.serious();
+                log.setStatusCode(0);
+            }
         }
+        logServiceApi.addLog(log);
         return retObi;
     }
 
     /**
-     * 查看所有的分类
+     * 管理员查看所有的分类
+     *
+     * @return
+     */
+    @GetMapping("/admin/categories")
+    public Object adminListGoodsCategory(@RequestParam(defaultValue = "1") Integer page,
+                                    @RequestParam(defaultValue = "10") Integer limit) {
+        Object retobj;
+        Log log=new Log();
+        log.setActions("查看分类");
+        log.setType(0);
+        PageHelper.startPage(page,limit);
+        List<GoodsCategoryPo> categoryPoList = goodsService.listGoodsCategory();
+        PageInfo<GoodsCategoryPo> categoryPageInfo = new PageInfo<>(categoryPoList);
+        List<GoodsCategoryPo> pagelist =categoryPageInfo.getList();
+        retobj=ResponseUtil.ok(pagelist);
+        log.setStatusCode(1);
+        logServiceApi.addLog(log);
+        return retobj;
+    }
+    /**
+     * 用户查看所有的分类
      *
      * @return
      */
@@ -553,30 +752,44 @@ public class GoodsController {
     }
 
     /**
-     * 管理员、用户查看单个分类信息
+     * 管理员查看单个分类信息
      *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * @param id
      * @return
      */
-    @GetMapping("/categories/{id}")
+    @GetMapping("/admin/categories/{id}")
     public Object getGoodsCategoryPoById(@PathVariable Integer id) {
         Object retobj;
-        retobj=ResponseUtil.ok(goodsService.getGoodsCategoryPoById(id));
+        Log log=new Log();
+        log.setActions("查看分类");
+        log.setType(0);
+        if(id<=0){
+            retobj=ResponseUtil.badArgumentValue();
+            log.setStatusCode(0);
+        }else {
+            retobj=ResponseUtil.ok(goodsService.getGoodsCategoryPoById(id));
+            log.setStatusCode(1);
+        }
+        logServiceApi.addLog(log);
         return retobj;
     }
 
-//    /**
-//     * 用户查看单个分类信息
-//     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//     * @param id
-//     * @return
-//     */
-//    @GetMapping("/users/categories/{id}")
-//    public Object adminGetGoodsCategoryById(@PathVariable Integer id) {
-//        GoodsCategory goodsCategory=goodsService.getCategoryById(id);
-//        goodsCategory.setGoodsPoList(goodsService.getCategoriesInfoById(id));
-//        return goodsCategory;
-//    }
+    /**
+     * 用户查看单个分类信息
+     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     * @param id
+     * @return
+     */
+    @GetMapping("/categories/{id}")
+    public Object adminGetGoodsCategoryById(@PathVariable Integer id) {
+        Object retobj;
+        if(id<=0){
+            retobj=ResponseUtil.badArgumentValue();
+        }else {
+            retobj=ResponseUtil.ok(goodsService.getGoodsCategoryPoById(id));
+        }
+        return retobj;
+    }
 
 
     /**
@@ -585,13 +798,18 @@ public class GoodsController {
      * @return
      */
     @PostMapping("/categories")
-    public Object addGoodsCategory(GoodsCategoryPo goodsCategoryPo) {
+    public Object addGoodsCategory(@RequestBody GoodsCategoryPo goodsCategoryPo) {
         Object retobj = null;
+        Log log=new Log();
+        log.setActions("新建分类");
+        log.setType(1);
         if(goodsCategoryPo.getPid()==null){
             if(goodsCategoryMapper.addGoodsCategory(goodsCategoryPo)==1){
                 retobj=ResponseUtil.ok(goodsService.getGoodsCategoryPoById(goodsCategoryPo.getId()));
+                log.setStatusCode(1);
             }else {
                 retobj=ResponseUtil.updatedDataFailed();
+                log.setStatusCode(0);
             }
         }
         else if(goodsCategoryPo.getPid()!=null){
@@ -600,15 +818,19 @@ public class GoodsController {
             goodsCategoryPo1=goodsService.getGoodsCategoryPoById(p);
             if(goodsCategoryPo1.getPid()!=null){
                 retobj=ResponseUtil.badArgumentValue();
+                log.setStatusCode(0);
             }
             else {
                 if(goodsCategoryMapper.addGoodsCategory(goodsCategoryPo)==1){
                     retobj=ResponseUtil.ok(goodsService.getGoodsCategoryPoById(goodsCategoryPo.getId()));
+                    log.setStatusCode(1);
                 }else {
                     retobj=ResponseUtil.updatedDataFailed();
+                    log.setStatusCode(0);
                 }
             }
         }
+        logServiceApi.addLog(log);
         return retobj;
     }
 
@@ -616,19 +838,29 @@ public class GoodsController {
      * 修改分类信息，删掉body注解，修改不能更改在一级或二级分类
      * 二级到一级会影响到商品的归属，一级到二级影响其他子分类
      * 所以不可修改pid。只能修改name和图片
-     * 不过为什么isOneLevelCategory报空指针？？？？
      * @param id
      * @param goodsCategoryPo
      * @return
      */
     @PutMapping("/categories/{id}")
-    public Object updateGoodsCategoryById(@PathVariable Integer id,GoodsCategoryPo goodsCategoryPo) {
+    public Object updateGoodsCategoryById(@PathVariable Integer id,@RequestBody GoodsCategoryPo goodsCategoryPo) {
         Object retobj;
-        if(goodsCategoryMapper.updateGoodsCategoryById(goodsCategoryPo)==1){
-            retobj=ResponseUtil.ok(goodsService.getGoodsCategoryPoById(id));
+        Log log=new Log();
+        log.setActions("修改分类");
+        log.setType(2);
+        if(id<=0){
+            retobj=ResponseUtil.badArgumentValue();
+            log.setStatusCode(0);
         }else {
-            retobj=ResponseUtil.updatedDataFailed();
+            if(goodsCategoryMapper.updateGoodsCategoryById(goodsCategoryPo)==1){
+                retobj=ResponseUtil.ok(goodsService.getGoodsCategoryPoById(id));
+                log.setStatusCode(1);
+            }else {
+                log.setStatusCode(0);
+                retobj=ResponseUtil.updatedDataFailed();
+            }
         }
+        logServiceApi.addLog(log);
         return retobj;
     }
 
@@ -643,22 +875,31 @@ public class GoodsController {
     @DeleteMapping("/categories/{id}")
     public Object deleteGoodsCategory(@PathVariable Integer id) {
         Object retObj;
-        GoodsCategoryPo goodsCategoryPo=goodsService.getGoodsCategoryPoById(id);
-        Integer point= goodsCategoryPo.getPid();
-        if(point==null){
-            List<Integer> list=goodsService.getSecondLevelId(id);
-            for(Integer i : list) {
-                goodsService.nullCategoryGoodsPoList(i);
+        Log log=new Log();
+        log.setActions("删除分类");
+        log.setType(3);
+        if(id<=0){
+            retObj=ResponseUtil.badArgumentValue();
+            log.setStatusCode(0);
+        }else {
+            GoodsCategoryPo goodsCategoryPo=goodsService.getGoodsCategoryPoById(id);
+            Integer point= goodsCategoryPo.getPid();
+            if(point==null){
+                List<Integer> list=goodsService.getSecondLevelId(id);
+                for(Integer i : list) {
+                    goodsService.nullCategoryGoodsPoList(i);
+                }
+                goodsService.deleteSecondLevelCategory(id);
+                goodsService.deleteGoodsCategory(id);
             }
-            goodsService.deleteSecondLevelCategory(id);
-            goodsService.deleteGoodsCategory(id);
-
+            if(point!=null){
+                goodsService.nullCategoryGoodsPoList(id);
+                goodsService.deleteGoodsCategory(id);
+            }
+            retObj=ResponseUtil.ok();
+            log.setStatusCode(1);
         }
-        if(point!=null){
-            goodsService.nullCategoryGoodsPoList(id);
-            goodsService.deleteGoodsCategory(id);
-        }
-        retObj=ResponseUtil.ok();
+        logServiceApi.addLog(log);
         return retObj;
     }
 
@@ -704,7 +945,11 @@ public class GoodsController {
     @GetMapping("/categories/l1/{id}/l2")
     public Object listSecondLevelGoodsCategoryById(@PathVariable Integer id) {
         Object retobj;
-        retobj=ResponseUtil.ok(goodsService.listSecondLevelGoodsCategoryById(id));
+        if(id<=0){
+            retobj=ResponseUtil.badArgumentValue();
+        }else {
+            retobj=ResponseUtil.ok(goodsService.listSecondLevelGoodsCategoryById(id));
+        }
         return retobj;
     }
     /**
@@ -729,7 +974,7 @@ public class GoodsController {
      * @return
      */
 
-    @PutMapping("/goods/{id}/deduct")
+    @PutMapping("/product/{id}/deduct")
     public boolean deduct(@PathVariable Integer id,@RequestParam Integer quantity){
         ProductPo productPo=new ProductPo();
         productPo=goodsService.getProductById(id);

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 /**
  * @author
  */
-@FeignClient(value = "Comment")
+@FeignClient(value = "commentService")
 @Service
 @RequestMapping("/commentService")
 public interface CommentServiceApi {

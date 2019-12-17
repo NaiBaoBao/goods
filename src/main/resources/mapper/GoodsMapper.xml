@@ -138,12 +138,7 @@
                 price
                 from oomall_goods
                 where
-                <if test="name!=null">
                 name=#{name} and
-                </if>
-                <if test="goodsSn!=null">
-                goods_sn=#{goodsSn} and
-                </if>
                 is_deleted=0 and status!=0
     </select>
         <select id="adminListGoods" resultMap="GoodsPo">

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 /**
  * @author
  */
-@FeignClient(value = "Footprint")
+@FeignClient(value = "footprintService")
 @Service
 @RequestMapping("/footprintService")
 public interface FootprintServiceApi {

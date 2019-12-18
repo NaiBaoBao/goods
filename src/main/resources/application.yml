@@ -2,12 +2,12 @@ spring:
   application:
     name: goodsInfoService
   datasource:
-    url: jdbc:mysql://112.124.5.232:3306/oomall?serverTimezone=UTC&useSSL=false&useUnicode=true&characterEncoding=UTF-8
+    url: jdbc:mysql://localhost:3306/oomall?serverTimezone=UTC&useSSL=false&useUnicode=true&characterEncoding=UTF-8
     username: root
     password: 12345678
     driver-class-name: com.mysql.jdbc.Driver
   redis:
-    host: 112.124.5.232
+    host: localhost
     port: 6379
     database: 0
     jedis:
@@ -30,9 +30,13 @@ pagehelper:
 server:
   port: 8017
 eureka:
-  client:
-   serviceUrl:
-      defaultZone: http://112.124.5.232:8011/eureka/
+  instance:
+    hostname: localhost
+    metadata-map:
+      instanceId: ${spring.application.name}:${spring.application.instance_id}:${random.value}
+#  client:
+#   serviceUrl:
+#      defaultZone: http://112.124.5.232:8011/eureka/
 web:
   path: /picture
 goods:

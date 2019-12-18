@@ -28,7 +28,8 @@
     </insert>
     <update id="deleteProductById" parameterType="integer">
         update oomall_product
-        set is_deleted=1
+        set is_deleted=1,
+        gmt_modified=current_timestamp
         where id=#{id}
     </update>
     <select id="getProductById" parameterType="integer" resultMap="ProductPo">
@@ -54,7 +55,8 @@
     </update>
     <update id="deleteProductsByGoodsId" parameterType="integer">
         update oomall_product
-        set is_deleted=1
+        set is_deleted=1,
+        gmt_modified=current_timestamp
         where goods_id=#{id};
     </update>
 </mapper>

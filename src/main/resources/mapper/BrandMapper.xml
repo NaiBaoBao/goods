@@ -11,7 +11,8 @@
     </resultMap>
     <update id="deleteBrandById" parameterType="integer">
         update oomall_brand
-        set is_deleted=1
+        set is_deleted=1,
+        gmt_modified=current_timestamp
         where id=#{id}
     </update>
     <select id="listBrandByCondition" resultMap="BrandPo">

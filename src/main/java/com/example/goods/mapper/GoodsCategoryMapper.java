@@ -73,4 +73,5 @@ public interface GoodsCategoryMapper {
      */
     public List<Integer> getSecondLevelId(Integer id);
 
+    public int updateGoodsCategoryPid(GoodsCategoryPo goodsCategoryPo);
 }

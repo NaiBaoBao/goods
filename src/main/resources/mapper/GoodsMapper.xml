@@ -200,7 +200,8 @@
         </update>
         <update id="deleteGoodsById" parameterType="integer">
                 update oomall_goods
-                set is_deleted=1
+                set is_deleted=1,
+                gmt_modified=current_timestamp
                 where id=#{id}
         </update>
         <update id="nullBrandGoodsPoList" parameterType="integer">

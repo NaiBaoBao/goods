@@ -38,9 +38,16 @@
             pic_url=#{picUrl}
             where id=#{id}
     </update>
+    <update id="updateGoodsCategoryPid" parameterType="com.example.goods.domain.GoodsCategoryPo" >
+        update oomall_goods_category
+        set pid=#{pid},
+            gmt_modified=current_timestamp
+            where id=#{id}
+    </update>
     <update id="deleteGoodsCategory" parameterType="integer">
         update oomall_goods_category
-        set is_deleted=1
+        set is_deleted=1,
+        gmt_modified=current_timestamp
         where id=#{id}
     </update>
     <select id="listOneLevelGoodsCategory" resultMap="GoodsCategoryPo">
@@ -63,7 +70,8 @@
     </select>
     <update id="deleteSecondLevelCategory" parameterType="integer">
         update oomall_goods_category
-        set is_deleted=1
+        set is_deleted=1,
+        gmt_modified=current_timestamp
         where pid=#{id}
     </update>
     <select id="getSecondLevelId" parameterType="integer" resultType="integer">

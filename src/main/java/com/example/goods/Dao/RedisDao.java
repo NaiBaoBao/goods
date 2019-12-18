@@ -33,21 +33,21 @@ public class RedisDao {
     @Autowired
     private Config config;
 
-    /**
-     * 用ID获取货品
-     * @param id 货品id
-     * @return
-     */
-    public ProductPo getProductById(Integer id){
-        String key = "P_"+id;
-        ProductPo productPo = (ProductPo) redisTemplate.opsForValue().get(key);
-        if (productPo == null) {
-            productPo = productMapper.getProductById(id);
-            System.out.println("redis中没有此货品");
-            redisTemplate.opsForValue().set(key, productPo,config.getRedisExpireTime(), TimeUnit.MINUTES);
-        }
-        return productPo;
-    }
+//    /**
+//     * 用ID获取货品
+//     * @param id 货品id
+//     * @return
+//     */
+//    public ProductPo getProductById(Integer id){
+//        String key = "P_"+id;
+//        ProductPo productPo = (ProductPo) redisTemplate.opsForValue().get(key);
+//        if (productPo == null) {
+//            productPo = productMapper.getProductById(id);
+//            System.out.println("redis中没有此货品");
+//            redisTemplate.opsForValue().set(key, productPo,config.getRedisExpireTime(), TimeUnit.MINUTES);
+//        }
+//        return productPo;
+//    }
 
     /**
      * 用ID获取商品
@@ -55,6 +55,16 @@ public class RedisDao {
      * @return 商品
      */
     public GoodsPo getGoodsById(Integer id){
+        String key = "G_"+id;
+        GoodsPo goodsPo = (GoodsPo) redisTemplate.opsForValue().get(key);
+        if (goodsPo == null) {
+            goodsPo = goodsMapper.getGoodsById(id);
+            System.out.println("redis中没有此商品");
+            redisTemplate.opsForValue().set(key, goodsPo, config.getRedisExpireTime(), TimeUnit.MINUTES);
+        }
+        return goodsPo;
+    }
+    public GoodsPo userGetGoodsById(Integer id){
         String key = "G_"+id;
         GoodsPo goodsPo = (GoodsPo) redisTemplate.opsForValue().get(key);
         if (goodsPo == null) {

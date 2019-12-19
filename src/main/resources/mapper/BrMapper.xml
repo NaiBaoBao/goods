@@ -13,9 +13,7 @@
     select id,
     name,
     description,
-    pic_url,
-    gmt_create,
-    gmt_modified
+    pic_url
     from oomall_brand where id=#{id} and is_deleted=0
     </select>
 </mapper>

@@ -17,9 +17,7 @@
                specifications,
                goods_id,
                price,
-               safety_stock,
-               gmt_create,
-               gmt_modified
+               safety_stock
                from oomall_product where goods_id=#{id} and is_deleted=0
     </select>
     <insert id="addProductByGoodsId" parameterType="com.example.goods.domain.ProductPo" useGeneratedKeys="true" keyProperty="id">
@@ -38,9 +36,7 @@
                specifications,
                goods_id,
                price,
-               safety_stock,
-               gmt_create,
-               gmt_modified
+               safety_stock
                from oomall_product where id=#{id} and is_deleted=0
     </select>
     <update id="updateProductById" parameterType="com.example.goods.domain.ProductPo">

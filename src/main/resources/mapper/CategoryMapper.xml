@@ -13,8 +13,6 @@
         select id,
                name,
                pid,
-               gmt_create,
-               gmt_modified,
                pic_url
                from oomall_goods_category where id=#{id} and is_deleted=0
     </select>

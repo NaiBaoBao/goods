@@ -29,16 +29,16 @@ pagehelper:
   params: count=countsql
 server:
   port: 8017
-eureka:
-  instance:
-    hostname: localhost
-    metadata-map:
-      instanceId: ${spring.application.name}:${spring.application.instance_id}:${random.value}
+#eureka:
+#  instance:
+#    hostname: localhost
+#    metadata-map:
+#      instanceId: ${spring.application.name}:${spring.application.instance_id}:${random.value}
 #  client:
-#   serviceUrl:
+#    serviceUrl:
 #      defaultZone: http://112.124.5.232:8011/eureka/
 web:
   path: /picture
 goods:
-  redisExpireTime: 1
+  redisExpireTime: 2
 

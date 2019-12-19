@@ -25,8 +25,6 @@
     </resultMap>
     <select id="getGoodsById" parameterType="integer" resultMap="GoodsPo">
         select  id,
-                gmt_create,
-                gmt_modified,
                 name,
                 goods_sn,
                 short_name,
@@ -48,8 +46,6 @@
     </select>
         <select id="userGetGoodsById" parameterType="integer" resultMap="GoodsPo">
         select  id,
-                gmt_create,
-                gmt_modified,
                 name,
                 goods_sn,
                 short_name,
@@ -71,8 +67,6 @@
     </select>
     <select id="getCategoriesInfoById" parameterType="integer" resultMap="GoodsPo">
         select  id,
-                gmt_create,
-                gmt_modified,
                 name,
                 goods_sn,
                 short_name,
@@ -94,8 +88,6 @@
     </select>
     <select id="adminGetCategoriesInfoById" parameterType="integer" resultMap="GoodsPo">
         select  id,
-                gmt_create,
-                gmt_modified,
                 name,
                 goods_sn,
                 short_name,
@@ -117,8 +109,6 @@
     </select>
     <select id="listGoods" resultMap="GoodsPo">
         select  id,
-                gmt_create,
-                gmt_modified,
                 name,
                 goods_sn,
                 short_name,
@@ -143,8 +133,6 @@
     </select>
         <select id="adminListGoods" resultMap="GoodsPo">
                 select  id,
-                gmt_create,
-                gmt_modified,
                 name,
                 goods_sn,
                 short_name,
@@ -172,10 +160,138 @@
                 </if>
                 is_deleted=0
         </select>
-        <insert id="addGoods" parameterType="com.example.goods.domain.GoodsPo" useGeneratedKeys="true" keyProperty="id">
-                insert into oomall_goods (gmt_create,gmt_modified,name,goods_sn,short_name,description,brief,pic_url,detail,status,share_url,gallery,goods_category_id,brand_id,is_deleted,weight,volume,special_freight_id,is_special,price)
-                values (current_timestamp ,current_timestamp,#{name},#{goodsSn},#{shortName},#{description},#{brief},#{picUrl},#{detail},#{statusCode},#{shareUrl},#{gallery},#{goodsCategoryId},#{brandId},0,#{weight},#{volume},#{specialFreightId},#{beSpecial},#{price})
-        </insert>
+    <sql id="key">
+        <trim suffixOverrides=",">
+            <if test="gmtCreate!=null and gmtCreate!=''">
+                gmt_create,
+            </if>
+            <if test="gmtModified!=null and gmtModified!=''">
+                gmt_modified,
+            </if>
+            <if test="name!=null and name!=''">
+                name,
+            </if>
+            <if test="goodsSn!=null and goodsSn!=''">
+                goods_sn,
+            </if>
+            <if test="shortName!=null and shortName!=''">
+                short_name,
+            </if>
+            <if test="description!=null and description!=''">
+                description,
+            </if>
+            <if test="brief!=null and brief!=''">
+                brief,
+            </if>
+            <if test="picUrl!=null and picUrl!=''">
+                pic_url,
+            </if>
+            <if test="detail!=null and detail!=''">
+                detail,
+            </if>
+            <if test="statusCode!=null and statusCode!=''">
+                status,
+            </if>
+            <if test="shareUrl!=null and shareUrl!=''">
+                share_url,
+            </if>
+            <if test="gallery!=null and gallery!=''">
+                gallery,
+            </if>
+            <if test="goodsCategoryId!=null and goodsCategoryId!=''">
+                goods_category_id,
+            </if>
+            <if test="brandId!=null and brandId!=''">
+                brand_id,
+            </if>
+            <if test="beDeleted!=null and beDeleted!=''">
+                is_deleted,
+            </if>
+            <if test="weight!=null and weight!=''">
+                weight,
+            </if>
+            <if test="volume!=null and volume!=''">
+                volume,
+            </if>
+            <if test="specialFreightId!=null and specialFreightId!=''">
+                special_freight_id,
+            </if>
+            <if test="beSpecial!=null and beSpecial!=''">
+                is_special,
+            </if>
+            <if test="price!=null and price!=''">
+                price
+            </if>
+        </trim>
+    </sql>
+    <sql id="values">
+        <trim suffixOverrides=",">
+            <if test="gmtCreate!=null and gmtCreate!=''">
+                current_timestamp,
+            </if>
+            <if test="gmtModified!=null and gmtModified!=''">
+                current_timestamp,
+            </if>
+            <if test="name!=null and name!=''">
+                #{name},
+            </if>
+            <if test="goodsSn!=null and goodsSn!=''">
+                #{goodsSn},
+            </if>
+            <if test="shortName!=null and shortName!=''">
+                #{shortName},
+            </if>
+            <if test="description!=null and description!=''">
+                #{description},
+            </if>
+            <if test="brief!=null and brief!=''">
+                #{brief},
+            </if>
+            <if test="picUrl!=null and picUrl!=''">
+                #{picUrl},
+            </if>
+            <if test="detail!=null and detail!=''">
+                #{detail},
+            </if>
+            <if test="statusCode!=null and statusCode!=''">
+                0,
+            </if>
+            <if test="shareUrl!=null and shareUrl!=''">
+                #{shareUrl},
+            </if>
+            <if test="gallery!=null and gallery!=''">
+                #{gallery},
+            </if>
+            <if test="goodsCategoryId!=null and goodsCategoryId!=''">
+                #{goodsCategoryId},
+            </if>
+            <if test="brandId!=null and brandId!=''">
+                #{brandId},
+            </if>
+            <if test="beDeleted!=null and beDeleted!=''">
+                0,
+            </if>
+            <if test="weight!=null and weight!=''">
+                #{weight},
+            </if>
+            <if test="volume!=null and volume!=''">
+                #{volume},
+            </if>
+            <if test="specialFreightId!=null and specialFreightId!=''">
+                #{specialFreightId},
+            </if>
+            <if test="beSpecial!=null and beSpecial!=''">
+                #{beSpecial},
+            </if>
+            <if test="price!=null and price!=''">
+                #{price}
+            </if>
+        </trim>
+    </sql>
+    <insert id="addGoods" parameterType="com.example.goods.domain.GoodsPo" useGeneratedKeys="true" keyProperty="id">
+        insert into oomall_goods(<include refid="key"/>)
+        values(<include refid="values"/>)
+    </insert>
         <update id="updateGoodsById" parameterType="com.example.goods.domain.GoodsPo">
                 update oomall_goods
                 set gmt_modified=current_timestamp ,
@@ -206,20 +322,18 @@
         </update>
         <update id="nullBrandGoodsPoList" parameterType="integer">
                 update oomall_goods
-                set brand_id=null ,
+                set brand_id=0 ,
                     gmt_modified=current_timestamp
                 where brand_id=#{id}
         </update>
         <update id="nullCategoryGoodsPoList" parameterType="integer">
                 update oomall_goods
-                set goods_category_id=null,
+                set goods_category_id=0,
                     gmt_modified=current_timestamp
                 where goods_category_id=#{id}
         </update>
     <select id="getBrandsInfoById" parameterType="integer" resultMap="GoodsPo">
         select  id,
-                gmt_create,
-                gmt_modified,
                 name,
                 goods_sn,
                 short_name,
@@ -241,8 +355,6 @@
     </select>
     <select id="userGetBrandsInfoById" resultMap="GoodsPo">
         select  id,
-                gmt_create,
-                gmt_modified,
                 name,
                 goods_sn,
                 short_name,

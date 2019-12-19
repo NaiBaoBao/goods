@@ -19,9 +19,7 @@
         select id,
         name,
         description,
-        pic_url,
-        gmt_create,
-        gmt_modified
+        pic_url
         from oomall_brand
         where
         <if test="id!=null">
@@ -36,10 +34,7 @@
         select id,
         name,
         description,
-        pic_url,
-        gmt_create,
-        gmt_modified,
-        is_deleted
+        pic_url
         from oomall_brand
         where is_deleted=0
     </select>
@@ -47,9 +42,7 @@
         select id,
                name,
                description,
-               pic_url,
-               gmt_create,
-               gmt_modified
+               pic_url
                from oomall_brand where id=#{id} and is_deleted=0
     </select>
     <insert id="addBrand" useGeneratedKeys="true" keyProperty="id">
@@ -64,5 +57,4 @@
                gmt_modified=current_timestamp
                where id=#{id}
     </update>
-
 </mapper>

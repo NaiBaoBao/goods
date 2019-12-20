@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @FeignClient(value = "commentService")
 @Service
-@RequestMapping("/commentService")
+//@RequestMapping("/commentService")
 public interface CommentServiceApi {
     /**
      * 调用comment模块的删除足迹

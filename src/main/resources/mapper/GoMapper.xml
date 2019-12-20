@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.goods.mapper.GoMapper">
+    <resultMap type="com.example.goods.domain.Goods" id="Goods">
+        <id property="id" column="id"/>
+        <result property="gmtCreate" column="gmt_create"/>
+        <result property="gmtModified" column="gmt_modified"/>
+        <result property="name" column="name"/>
+        <result property="goodsSn" column="goods_sn"/>
+        <result property="shortName" column="short_name"/>
+        <result property="description" column="description"/>
+        <result property="brief" column="brief"/>
+        <result property="picUrl" column="pic_url"/>
+        <result property="detail" column="detail"/>
+        <result property="statusCode" column="status"/>
+        <result property="shareUrl" column="share_url"/>
+        <result property="gallery" column="gallery"/>
+        <result property="goodsCategoryId" column="goods_category_id"/>
+        <result property="brandId" column="brand_id"/>
+        <result property="weight" column="weight"/>
+        <result property="volume" column="volume"/>
+        <result property="specialFreightId" column="special_freight_id"/>
+        <result property="beSpecial" column="is_special"/>
+        <result property="price" column="price"/>
+    </resultMap>
+    <select id="getGoods" parameterType="integer" resultMap="Goods">
+                select  id,
+                name,
+                goods_sn,
+                short_name,
+                description,
+                brief,
+                pic_url,
+                detail,
+                status,
+                share_url,
+                gallery,
+                goods_category_id,
+                brand_id,
+                weight,
+                volume,
+                special_freight_id,
+                is_special,
+                price
+                from oomall_goods where id=#{id} and is_deleted=0
+    </select>
+    <select id="userGetGoods" parameterType="integer" resultMap="Goods">
+                select  id,
+                name,
+                goods_sn,
+                short_name,
+                description,
+                brief,
+                pic_url,
+                detail,
+                status,
+                share_url,
+                gallery,
+                goods_category_id,
+                brand_id,
+                weight,
+                volume,
+                special_freight_id,
+                is_special,
+                price
+                from oomall_goods where id=#{id} and is_deleted=0 and status!=0
+    </select>
+</mapper>

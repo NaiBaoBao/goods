@@ -24,6 +24,10 @@ public class GoodsServiceImpl implements GoodsService {
     private CategoryMapper categoryMapper;
     @Resource
     private BrMapper brMapper;
+    @Resource
+    private GoMapper goMapper;
+    @Resource
+    private PrMapper prMapper;
 
     @Override
     public List<ProductPo> listProductByGoodsId(Integer id) {
@@ -229,5 +233,18 @@ public class GoodsServiceImpl implements GoodsService {
     @Override
     public Brand getBrandById(Integer id){
         return brMapper.getBrandById(id);
+    }
+
+    @Override
+    public Goods getGoods(Integer id){
+        return goMapper.getGoods(id);
+    }
+
+    @Override
+    public Goods userGetGoods(Integer id){return goMapper.userGetGoods(id);}
+
+    @Override
+    public Product getProduct(Integer id){
+        return prMapper.getProduct(id);
     }
 }

@@ -66,11 +66,11 @@ public class GoodsPo {
     /**
      * 商品分类ID
      */
-    private Integer goodsCategoryId;
+    private Integer goodsCategoryId=0;
     /**
      * 品牌ID
      */
-    private Integer brandId;
+    private Integer brandId=0;
     /**
      * 商品重量
      */

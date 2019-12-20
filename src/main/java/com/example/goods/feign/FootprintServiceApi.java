@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 /**
  * @author
  */
-@FeignClient(value = "footprintService")
+@FeignClient(value = "footprintService",url = "http://47.98.162.161:8016")
 @Service
-@RequestMapping("/footprintService")
+//@RequestMapping("/footprintService")
 public interface FootprintServiceApi {
     /**
      * 调用footprint模块的添加足迹

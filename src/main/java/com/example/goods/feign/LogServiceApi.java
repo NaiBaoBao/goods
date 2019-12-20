@@ -7,13 +7,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-/**需要改成logService 还有@RequestMapping
+/**需要改成logService
  * @author
  */
-//@Component
-//@FeignClient(value = "logService")
+@Component
+@FeignClient(value = "logService",url = "http://121.199.2.219:8843")
 //@RequestMapping("/logService")
-//public interface LogServiceApi {
-//    @PostMapping("/log")
-//    void addLog(@RequestBody Log log);
-//}
+public interface LogServiceApi {
+    @PostMapping("/log")
+    void addLog(@RequestBody Log log);
+}

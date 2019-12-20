@@ -2,12 +2,14 @@ spring:
   application:
     name: goodsInfoService
   datasource:
+    hikari:
+      maximum-pool-size: 10
     url: jdbc:mysql://localhost:3306/oomall?serverTimezone=UTC&useSSL=false&useUnicode=true&characterEncoding=UTF-8
     username: root
     password: 12345678
     driver-class-name: com.mysql.jdbc.Driver
   redis:
-    host: localhost
+    host: 112.124.5.232
     port: 6379
     database: 0
     jedis:
@@ -29,16 +31,31 @@ pagehelper:
   params: count=countsql
 server:
   port: 8017
-#eureka:
-#  instance:
-#    hostname: localhost
-#    metadata-map:
-#      instanceId: ${spring.application.name}:${spring.application.instance_id}:${random.value}
-#  client:
-#    serviceUrl:
-#      defaultZone: http://112.124.5.232:8011/eureka/
+eureka:
+  instance:
+    prefer-ip-address: true
+    non-secure-port: 8017
+    ip-address: 112.124.5.232
+#    或者另一个我们的服务器
+  client:
+    serviceUrl:
+      defaultZone: http://112.124.5.232:8011/eureka/
 web:
   path: /picture
 goods:
   redisExpireTime: 2
 
+feign:
+  hystrix:
+    enabled: false
+  client:
+    config:
+      share:
+        connectTimeout: 120000
+        readTimeout: 120000
+  compression:
+    request:
+      enabled: true
+      mime-types: text/xml,application/xml,application/json
+    response:
+      enabled: true

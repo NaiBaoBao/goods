@@ -250,4 +250,25 @@ public interface GoodsService {
      */
     int isFirstLevelCategory(Integer id);
 
+
+    /**
+     * 管理员通过id获取goods的po部分信息
+     * @param id
+     * @return
+     */
+    Goods getGoods(Integer id);
+
+    /**
+     * 通过id获取goods的po部分信息
+     * @param id
+     * @return
+     */
+    Goods userGetGoods(Integer id);
+
+    /**
+     * 通过id获取product的po部分信息
+     * @param id
+     * @return
+     */
+    Product getProduct(Integer id);
 }

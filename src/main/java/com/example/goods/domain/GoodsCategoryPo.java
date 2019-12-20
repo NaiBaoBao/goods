@@ -26,7 +26,7 @@ public class GoodsCategoryPo {
     /**
      * 该种类的父种类ID
      */
-    private Integer pid;
+    private Integer pid=0;
     /**
      * 二级目录的pic
      */

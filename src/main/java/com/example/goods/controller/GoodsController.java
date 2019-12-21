@@ -89,8 +89,10 @@ public class GoodsController {
         log.setType(1);
         Integer cid=goodsPo.getGoodsCategoryId();//cid是商品分类id
         Integer id=goodsPo.getId();//id是商品id
+        System.out.println(id);
+        System.out.println(cid);
         //无分类商品，正常新建
-        if(cid==null){
+        if(cid==0){
             if(goodsMapper.addGoods(goodsPo)==1) {
                 retobj=ResponseUtil.ok(goodsService.getGoodsById(id));
                 log.setStatusCode(1);
@@ -114,6 +116,7 @@ public class GoodsController {
                 }
             }
         }
+        logServiceApi.addLog(log);
         return retobj;
     }
 
@@ -407,7 +410,7 @@ public class GoodsController {
      * ?????????????？？？？？？？??????????头部读不出来
      */
     @GetMapping("/goods/{id}")
-    public Object userGetGoodsById(@RequestHeader HttpServletRequest request,@PathVariable(value = "id") Integer id) {
+    public Object userGetGoodsById(HttpServletRequest request,@PathVariable(value = "id") Integer id) {
        Object retobj=new Object();
         Goods goods=goodsService.userGetGoods(id);
         String userId = request.getHeader("id");
@@ -421,9 +424,10 @@ public class GoodsController {
                 footprintItemPo.setUserId(i);
                 footprintItemPo.setGoodsId(id);
                 footprintServiceApi.addFootprint(footprintItemPo);
-                    goods.setBrandPo(brandMapper.getBrandPoById(goods.getId()));
-                    goods.setGoodsCategoryPo(goodsCategoryMapper.getGoodsCategoryPoById(goods.getGoodsCategoryId()));
-                    goods.setProductPoList(productMapper.listProductByGoodsId(goods.getId()));
+                //System.out.println(goods.getBrandId());103
+                    goods.setBrandPo(goodsService.getBrandPoById(goods.getBrandId()));
+                    goods.setGoodsCategoryPo(goodsService.getGoodsCategoryPoById(goods.getGoodsCategoryId()));
+                    goods.setProductPoList(goodsService.listProductByGoodsId(goods.getId()));
 //                goods.setShareRule();
 //                goods.setGrouponRule();
 //                goods.getPresaleRule();
@@ -576,7 +580,7 @@ public class GoodsController {
     @GetMapping("/goods")
     public Object listGoods(@RequestParam String name,
                                  @RequestParam(defaultValue = "1") Integer page,
-                                 @RequestParam(defaultValue = "5") Integer limit){
+                                 @RequestParam(defaultValue = "10") Integer limit){
         Object retobj;
         if(name==null||page==null||limit==null){
             retobj=ResponseUtil.getGoodsListFail();
@@ -684,6 +688,7 @@ public class GoodsController {
     public Object userGetBrandPoById(@PathVariable(value = "id") Integer id) {
         Object retobj;
         BrandPo brandPo=brandMapper.getBrandPoById(id);
+
         if(id<=0||brandPo==null||id==null){
             retobj=ResponseUtil.nullBrandFail();
         }else {
@@ -1047,7 +1052,6 @@ public class GoodsController {
     @GetMapping("/inner/goods/{id}")
     public GoodsPo getGoodsByIdIn(@PathVariable(value = "id") Integer id) {
         return goodsService.userGetGoodsById(id);
-
     }
 
 

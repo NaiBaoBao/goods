@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @author
  */
 @Component
-@FeignClient(value = "logService",url = "http://121.199.2.219:8843")
+@FeignClient(value = "logService")
 //@RequestMapping("/logService")
 public interface LogServiceApi {
     @PostMapping("/log")

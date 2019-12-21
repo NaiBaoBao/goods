@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -79,44 +80,49 @@ public class GoodsController {
      * 新建商品，不能建在一级分类下面，更改同理, 新建是下架状态
      *
      * @param goodsPo
-     * @return Goods，即新建的一个商品
+     * @return GoodsPo，即新建的一个商品
      */
     @PostMapping("/goods")
     public Object addGoods(@RequestBody GoodsPo goodsPo) {
         Object retobj=new Object();
-        Log log=new Log();
-        log.setActions("新建商品");
-        log.setType(1);
+//        Log log=new Log();
+//        log.setActions("新建商品");
+//        log.setType(1);
         Integer cid=goodsPo.getGoodsCategoryId();//cid是商品分类id
-        Integer id=goodsPo.getId();//id是商品id
-        System.out.println(id);
-        System.out.println(cid);
+        Integer id;//id是商品id
         //无分类商品，正常新建
         if(cid==0){
+            goodsPo.setGmtModified(LocalDateTime.now());
+            goodsPo.setGmtCreate(LocalDateTime.now());
             if(goodsMapper.addGoods(goodsPo)==1) {
-                retobj=ResponseUtil.ok(goodsService.getGoodsById(id));
-                log.setStatusCode(1);
+                id=goodsPo.getId();
+                retobj=ResponseUtil.ok(goodsPo);
+//                log.setStatusCode(1);
             }else {
                 retobj=ResponseUtil.addGoodsFail();
-                log.setStatusCode(0);
+//                log.setStatusCode(0);
             }
         }else {//有分类商品，Po是其分类
             GoodsCategoryPo goodsCategoryPo=goodsService.getGoodsCategoryPoById(cid);
             if(goodsCategoryPo.getPid()==0) {//错误建在一级分类下
                 retobj=ResponseUtil.addGoodsFail();
-                log.setStatusCode(0);
+//                log.setStatusCode(0);
             }
             else if(goodsCategoryPo.getPid()!=0){//建在了二级分类下，正常新建
                 if(goodsMapper.addGoods(goodsPo)==1) {
-                    retobj=ResponseUtil.ok(goodsService.getGoodsById(id));
-                    log.setStatusCode(1);
+                    id=goodsPo.getId();
+                    goodsPo=goodsService.getGoodsById(id);
+                    goodsPo.setGmtModified(LocalDateTime.now());
+                    goodsPo.setGmtCreate(LocalDateTime.now());
+                    retobj=ResponseUtil.ok(goodsPo);
+//                    log.setStatusCode(1);
                 }else {
                     retobj=ResponseUtil.addGoodsFail();
-                    log.setStatusCode(0);
+//                    log.setStatusCode(0);
                 }
             }
         }
-        logServiceApi.addLog(log);
+//        logServiceApi.addLog(log);
         return retobj;
     }
 
@@ -130,29 +136,29 @@ public class GoodsController {
     @DeleteMapping("/goods/{id}")
     public Object deleteGoodsById(@PathVariable(value = "id") Integer id) {
         Object retObi;
-        Log log=new Log();
-        log.setActions("删除下架商品");
-        log.setType(3);
+//        Log log=new Log();
+//        log.setActions("删除下架商品");
+//        log.setType(3);
         GoodsPo goodsPo=goodsService.getGoodsById(id);
         if(goodsPo==null||id==null||id<=0){
-            log.setStatusCode(0);
+//            log.setStatusCode(0);
             retObi=ResponseUtil.nullGoodsFail();
         }else {
             if(goodsPo.getStatusCode()==0){
                 if(goodsMapper.deleteGoodsById(id)==1){
                     goodsService.deleteProductsByGoodsId(id);
                     retObi=ResponseUtil.ok();
-                    log.setStatusCode(1);
+//                    log.setStatusCode(1);
                 }else {
                     retObi=ResponseUtil.deleteGoodsFail();
-                    log.setStatusCode(0);
+//                    log.setStatusCode(0);
                 }
             }else {
                 retObi=ResponseUtil.deleteGoodsFail();
-                log.setStatusCode(0);
+//                log.setStatusCode(0);
             }
         }
-        logServiceApi.addLog(log);
+//        logServiceApi.addLog(log);
         return retObi;
     }
 
@@ -166,40 +172,40 @@ public class GoodsController {
     @PutMapping("/goods/{id}")
     public Object updateGoodsById(@PathVariable(value = "id") Integer id, @RequestBody GoodsPo goodsPo) {
         Object retobj=new Object();
-        Log log=new Log();
-        log.setActions("修改商品");
-        log.setType(2);
+//        Log log=new Log();
+//        log.setActions("修改商品");
+//        log.setType(2);
         if(goodsPo==null||id==null||id<=0){
-            log.setStatusCode(0);
+//            log.setStatusCode(0);
             retobj=ResponseUtil.nullGoodsFail();
         }else {
             Integer cid=goodsPo.getGoodsCategoryId();
             if(cid==0){//更改后是无分类商品
                 if(goodsMapper.updateGoodsById(goodsPo)==1){
                     retobj=ResponseUtil.ok(goodsService.getGoodsById(id));
-                    log.setStatusCode(1);
+//                    log.setStatusCode(1);
                 }else {
                     retobj=ResponseUtil.updateGoodsFail();
-                    log.setStatusCode(0);
+//                    log.setStatusCode(0);
                 }
             }else if(cid!=0){//更改后是有分类商品
                 GoodsCategoryPo goodsCategoryPo=goodsService.getGoodsCategoryPoById(cid);
                 if(goodsCategoryPo.getPid()==0) {//错误更改在一级分类下
                     retobj=ResponseUtil.updateGoodsFail();
-                    log.setStatusCode(0);
+//                    log.setStatusCode(0);
                 }
                 else if(goodsCategoryPo.getPid()!=0){//正常更改在二级分类下
                     if(goodsMapper.updateGoodsById(goodsPo)==1) {
                         retobj=ResponseUtil.ok(goodsService.getGoodsById(id));
-                        log.setStatusCode(1);
+//                        log.setStatusCode(1);
                     }else {
                         retobj=ResponseUtil.updateGoodsFail();
-                        log.setStatusCode(0);
+//                        log.setStatusCode(0);
                     }
                 }
             }
         }
-        logServiceApi.addLog(log);
+//        logServiceApi.addLog(log);
         return retobj;
     }
 
@@ -218,27 +224,28 @@ public class GoodsController {
                                  @RequestParam(defaultValue = "4") Integer page,
                                  @RequestParam(defaultValue = "5") Integer limit){
         Object retobj;
-        Log log=new Log();
-        log.setActions("条件搜索商品");
-        log.setType(0);
-        if((goodsSn==null&&name==null)||page==null||limit==null){
-            retobj=ResponseUtil.getGoodsListFail();
-            log.setStatusCode(0);
+//        Log log=new Log();
+//        log.setActions("条件搜索商品");
+//        log.setType(0);
+        if((goodsSn==null&&name==null)||page==null||limit==null||page<=0||limit<=0){
+            retobj=ResponseUtil.paramfail();
+//            log.setStatusCode(0);
         }else {
             PageHelper.startPage(page, limit);
             List<GoodsPo> goodsList = goodsService.adminListGoods(goodsSn, name);
             PageInfo<GoodsPo> goodsPageInfo = new PageInfo<>(goodsList);
             List<GoodsPo> pagelist = goodsPageInfo.getList();
             retobj = ResponseUtil.ok(pagelist);
-            log.setStatusCode(1);
-            logServiceApi.addLog(log);
+//            log.setStatusCode(1);
+
         }
+//        logServiceApi.addLog(log);
         return retobj;
     }
 
 
     /**
-     * 管理员根据id获取某个商品详情,
+     * 管理员根据id获取某个商品详情
      *
      * @param id
      * @return Goods
@@ -246,13 +253,13 @@ public class GoodsController {
     @GetMapping("/admin/goods/{id}")
     public Object getGoodsById(@PathVariable(value = "id") Integer id) {
         Object retobj;
-        Log log = new Log();
-        log.setActions("根据id获得商品");
-        log.setType(0);
+//        Log log = new Log();
+//        log.setActions("根据id获得商品");
+//        log.setType(0);
         Goods goods=goodsService.getGoods(id);
         if (id <= 0||goods==null||id==null) {
             retobj = ResponseUtil.nullGoodsFail();
-            log.setStatusCode(0);
+//            log.setStatusCode(0);
         } else {
                 goods.setBrandPo(brandMapper.getBrandPoById(goods.getBrandId()));
                 goods.setGoodsCategoryPo(goodsCategoryMapper.getGoodsCategoryPoById(goods.getGoodsCategoryId()));
@@ -260,10 +267,10 @@ public class GoodsController {
 // 内部share              goods.setShareRule();
 // 内部discount              goods.setGrouponRule();
 // 内部discount             goods.getPresaleRule();
-                log.setStatusCode(1);
+//                log.setStatusCode(1);
                 retobj = ResponseUtil.ok(goods);
         }
-        logServiceApi.addLog(log);
+//        logServiceApi.addLog(log);
         return retobj;
     }
 
@@ -284,19 +291,19 @@ public class GoodsController {
 
     @GetMapping("/goods/{id}/products")
     public Object listProductByGoodsId(@PathVariable(value = "id") Integer id) {
-        Log log=new Log();
-        log.setActions("查找商品下货品");
-        log.setType(0);
+//        Log log=new Log();
+//        log.setActions("查找商品下货品");
+//        log.setType(0);
         Object retobj;
         GoodsPo goodsPo=goodsService.getGoodsById(id);
         if(id<=0||goodsPo==null||id==null){
-            log.setStatusCode(0);
+//            log.setStatusCode(0);
             retobj=ResponseUtil.nullGoodsFail();
         }else {
-            log.setStatusCode(1);
+//            log.setStatusCode(1);
             retobj=ResponseUtil.ok(goodsService.listProductByGoodsId(id));
         }
-        logServiceApi.addLog(log);
+//        logServiceApi.addLog(log);
         return retobj;
     }
 
@@ -309,24 +316,24 @@ public class GoodsController {
     @PostMapping("/goods/{id}/products")
     public Object addProductByGoodsId(@PathVariable(value = "id") Integer id,@RequestBody ProductPo productPo) {
         Object retobj;
-        Log log=new Log();
-        log.setActions("添加商品下产品");
-        log.setType(1);
+//        Log log=new Log();
+//        log.setActions("添加商品下产品");
+//        log.setType(1);
         GoodsPo goodsPo=goodsService.getGoodsById(id);
         if(id<=0||goodsPo==null||id==null){
-            log.setStatusCode(0);
+//            log.setStatusCode(0);
             retobj=ResponseUtil.nullGoodsFail();
         }else {
             productPo.setGoodsId(id);
             if(productMapper.addProductByGoodsId(productPo)==1){
                 retobj=ResponseUtil.ok(goodsService.getProductById(productPo.getId()));
-                log.setStatusCode(1);
+//                log.setStatusCode(1);
             }else {
                 retobj=ResponseUtil.addProductFail();
-                log.setStatusCode(0);
+//                log.setStatusCode(0);
             }
         }
-        logServiceApi.addLog(log);
+//        logServiceApi.addLog(log);
         return retobj;
     }
 
@@ -353,22 +360,22 @@ public class GoodsController {
     @PutMapping("/products/{id}")
     public Object updateProductById(@PathVariable(value = "id") Integer id, @RequestBody ProductPo productPo) {
         Object retobj;
-        Log log=new Log();
-        log.setActions("修改商品下产品");
-        log.setType(2);
+//        Log log=new Log();
+//        log.setActions("修改商品下产品");
+//        log.setType(2);
         if(id<=0||productPo==null||id==null){
-            log.setStatusCode(0);
+//            log.setStatusCode(0);
             retobj=ResponseUtil.nullGoodsFail();
         }else {
             if(productMapper.updateProductById(productPo)==1){
                 retobj=ResponseUtil.ok(goodsService.getProductById(id));
-                log.setStatusCode(1);
+//                log.setStatusCode(1);
             }else {
                 retobj=ResponseUtil.updateProductFail();
-                log.setStatusCode(0);
+//                log.setStatusCode(0);
             }
         }
-        logServiceApi.addLog(log);
+//        logServiceApi.addLog(log);
         return retobj;
     }
 
@@ -381,24 +388,24 @@ public class GoodsController {
     @DeleteMapping("/products/{id}")
     public Object deleteProductById(@PathVariable(value = "id") Integer id) {
         Object retObi;
-        Log log=new Log();
-        log.setActions("删除商品下产品");
-        log.setType(3);
+//        Log log=new Log();
+//        log.setActions("删除商品下产品");
+//        log.setType(3);
         ProductPo productPo=goodsService.getProductById(id);
         if(id<=0||productPo==null||id==null){
-            log.setStatusCode(0);
+//            log.setStatusCode(0);
             retObi=ResponseUtil.nullProductFail();
         }else {
             if(productMapper.deleteProductById(id)==1){
                 retObi=ResponseUtil.ok();
                 commentServiceApi.deletecommentbyproduct(id);
-                log.setStatusCode(1);
+//                log.setStatusCode(1);
             }else {
                 retObi=ResponseUtil.deleteProductFail();
-                log.setStatusCode(0);
+//                log.setStatusCode(0);
             }
         }
-        logServiceApi.addLog(log);
+//        logServiceApi.addLog(log);
         return retObi;
     }
 
@@ -607,12 +614,12 @@ public class GoodsController {
     public Object listBrandByCondition(@RequestParam Integer id,@RequestParam String name,
                                             @RequestParam(defaultValue = "1") Integer page,
                                             @RequestParam(defaultValue = "5") Integer limit) {
-        Log log=new Log();
-        log.setActions("根据条件搜索品牌");
-        log.setType(0);
+//        Log log=new Log();
+//        log.setActions("根据条件搜索品牌");
+//        log.setType(0);
         Object retobj;
         if(id<=0||(id==null&&name==null)||page==null||limit==null){
-            log.setStatusCode(0);
+//            log.setStatusCode(0);
             retobj=ResponseUtil.nullBrandFail();
         }
         else {
@@ -622,7 +629,7 @@ public class GoodsController {
             List<BrandPo> pagelist =brandPageInfo.getList();
             retobj=ResponseUtil.ok(pagelist);
         }
-        logServiceApi.addLog(log);
+//        logServiceApi.addLog(log);
         return retobj;
     }
 
@@ -636,21 +643,22 @@ public class GoodsController {
     @PostMapping("/brands")
     public Object addBrand(@RequestBody BrandPo brandPo) {
         Object retobj;
-        Log log=new Log();
-        log.setActions("创建品牌");
-        log.setType(1);
+//        Log log=new Log();
+//        log.setActions("创建品牌");
+//        log.setType(1);
         if(brandPo==null){
             retobj=ResponseUtil.nullBrandFail();
         }else {
             if (brandMapper.addBrand(brandPo) == 1) {
                 retobj = ResponseUtil.ok(goodsService.getBrandPoById(brandPo.getId()));
-            log.setStatusCode(1);
+//            log.setStatusCode(1);
             } else {
                 retobj = ResponseUtil.addBrandFail();
-            log.setStatusCode(0);
+//            log.setStatusCode(0);
             }
-            logServiceApi.addLog(log);
+//            logServiceApi.addLog(log);
         }
+//        logServiceApi.addLog(log);
         return retobj;
     }
 
@@ -663,18 +671,18 @@ public class GoodsController {
     @GetMapping("/admin/brands/{id}")
     public Object adminGetBrandById(@PathVariable(value = "id") Integer id) {
         Object retobj;
-        Log log=new Log();
-        log.setActions("查看品牌");
-        log.setType(0);
+//        Log log=new Log();
+//        log.setActions("查看品牌");
+//        log.setType(0);
         BrandPo brandPo=brandMapper.getBrandPoById(id);
         if(id<=0||brandPo==null||id==null) {
-            log.setStatusCode(0);
+//            log.setStatusCode(0);
             retobj = ResponseUtil.nullBrandFail();
         }else {
-            log.setStatusCode(1);
+//            log.setStatusCode(1);
             retobj=ResponseUtil.ok(goodsService.getBrandPoById(id));
         }
-        logServiceApi.addLog(log);
+//        logServiceApi.addLog(log);
         return retobj;
     }
 
@@ -707,22 +715,22 @@ public class GoodsController {
     @PutMapping("/brands/{id}")
     public Object updateBrandById(@PathVariable(value = "id") Integer id,@RequestBody BrandPo brandPo) {
         Object retobj;
-        Log log=new Log();
-        log.setActions("修改品牌");
-        log.setType(2);
+//        Log log=new Log();
+//        log.setActions("修改品牌");
+//        log.setType(2);
         if(id<=0||brandPo==null||id==null){
-            log.setStatusCode(0);
+//            log.setStatusCode(0);
             retobj=ResponseUtil.nullBrandFail();
         }else {
             if(brandMapper.updateBrandById(brandPo)==1){
                 retobj=ResponseUtil.ok(goodsService.getBrandPoById(id));
-                log.setStatusCode(1);
+//                log.setStatusCode(1);
             }else {
                 retobj=ResponseUtil.updateBrandFail();
-                log.setStatusCode(0);
+//                log.setStatusCode(0);
             }
         }
-        logServiceApi.addLog(log);
+//        logServiceApi.addLog(log);
         return retobj;
     }
 
@@ -736,24 +744,24 @@ public class GoodsController {
     @DeleteMapping("/brands/{id}")
     public Object deleteBrandById(@PathVariable(value = "id")Integer id) {
         Object retObi;
-        Log log=new Log();
-        log.setActions("删除品牌");
-        log.setType(3);
+//        Log log=new Log();
+//        log.setActions("删除品牌");
+//        log.setType(3);
         BrandPo brandPo=brandMapper.getBrandPoById(id);
         if(id<=0||brandPo==null||id==null){
-            log.setStatusCode(0);
+//            log.setStatusCode(0);
             retObi=ResponseUtil.nullBrandFail();
         }else {
             if(brandMapper.deleteBrandById(id)==1){
                 goodsService.nullBrandGoodsPoList(id);
                 retObi=ResponseUtil.ok();
-                log.setStatusCode(1);
+//                log.setStatusCode(1);
             }else {
                 retObi=ResponseUtil.deleteBrandFail();
-                log.setStatusCode(0);
+//                log.setStatusCode(0);
             }
         }
-        logServiceApi.addLog(log);
+//        logServiceApi.addLog(log);
         return retObi;
     }
 
@@ -766,9 +774,9 @@ public class GoodsController {
     public Object adminListGoodsCategory(@RequestParam(defaultValue = "1") Integer page,
                                     @RequestParam(defaultValue = "10") Integer limit) {
         Object retobj;
-        Log log=new Log();
-        log.setActions("查看分类");
-        log.setType(0);
+//        Log log=new Log();
+//        log.setActions("查看分类");
+//        log.setType(0);
         if(page==null||limit==null){
             retobj=ResponseUtil.getCategoryListFail();
         }else {
@@ -777,9 +785,9 @@ public class GoodsController {
             PageInfo<GoodsCategoryPo> categoryPageInfo = new PageInfo<>(categoryPoList);
             List<GoodsCategoryPo> pagelist =categoryPageInfo.getList();
             retobj=ResponseUtil.ok(pagelist);
-            log.setStatusCode(1);
+//            log.setStatusCode(1);
         }
-        logServiceApi.addLog(log);
+//        logServiceApi.addLog(log);
         return retobj;
     }
 //    /**
@@ -808,18 +816,18 @@ public class GoodsController {
     @GetMapping("/categories/{id}")
     public Object getGoodsCategoryPoById(@PathVariable(value = "id") Integer id) {
         Object retobj;
-        Log log=new Log();
-        log.setActions("查看分类");
-        log.setType(0);
+//        Log log=new Log();
+//        log.setActions("查看分类");
+//        log.setType(0);
         GoodsCategoryPo goodsCategoryPo=goodsCategoryMapper.getGoodsCategoryPoById(id);
         if(id<=0||goodsCategoryPo==null||id==null){
             retobj=ResponseUtil.nullCategoryFail();
-            log.setStatusCode(0);
+//            log.setStatusCode(0);
         }else {
             retobj=ResponseUtil.ok(goodsService.getGoodsCategoryPoById(id));
-            log.setStatusCode(1);
+//            log.setStatusCode(1);
         }
-        logServiceApi.addLog(log);
+//        logServiceApi.addLog(log);
         return retobj;
     }
 
@@ -849,16 +857,16 @@ public class GoodsController {
     @PostMapping("/categories")
     public Object addGoodsCategory(@RequestBody GoodsCategoryPo goodsCategoryPo) {
         Object retobj = null;
-        Log log=new Log();
-        log.setActions("新建分类");
-        log.setType(1);
+//        Log log=new Log();
+//        log.setActions("新建分类");
+//        log.setType(1);
         if(goodsCategoryPo.getPid()==null){
             if(goodsCategoryMapper.addGoodsCategory(goodsCategoryPo)==1){
                 retobj=ResponseUtil.ok(goodsService.getGoodsCategoryPoById(goodsCategoryPo.getId()));
-                log.setStatusCode(1);
+//                log.setStatusCode(1);
             }else {
                 retobj=ResponseUtil.addCategoryFail();
-                log.setStatusCode(0);
+//                log.setStatusCode(0);
             }
         }
         else if(goodsCategoryPo.getPid()!=null){
@@ -867,19 +875,19 @@ public class GoodsController {
             goodsCategoryPo1=goodsService.getGoodsCategoryPoById(p);
             if(goodsCategoryPo1.getPid()!=null){
                 retobj=ResponseUtil.addCategoryFail();
-                log.setStatusCode(0);
+//                log.setStatusCode(0);
             }
             else {
                 if(goodsCategoryMapper.addGoodsCategory(goodsCategoryPo)==1){
                     retobj=ResponseUtil.ok(goodsService.getGoodsCategoryPoById(goodsCategoryPo.getId()));
-                    log.setStatusCode(1);
+//                    log.setStatusCode(1);
                 }else {
                     retobj=ResponseUtil.addCategoryFail();
-                    log.setStatusCode(0);
+//                    log.setStatusCode(0);
                 }
             }
         }
-        logServiceApi.addLog(log);
+//        logServiceApi.addLog(log);
         return retobj;
     }
 
@@ -894,22 +902,22 @@ public class GoodsController {
     @PutMapping("/categories/{id}")
     public Object updateGoodsCategoryById(@PathVariable(value = "id") Integer id,@RequestBody GoodsCategoryPo goodsCategoryPo) {
         Object retobj;
-        Log log=new Log();
-        log.setActions("修改分类");
-        log.setType(2);
+//        Log log=new Log();
+//        log.setActions("修改分类");
+//        log.setType(2);
         if(id<=0||goodsCategoryPo==null||id==null){
             retobj=ResponseUtil.nullCategoryFail();
-            log.setStatusCode(0);
+//            log.setStatusCode(0);
         }else {
             if(goodsCategoryMapper.updateGoodsCategoryById(goodsCategoryPo)==1){
                 retobj=ResponseUtil.ok(goodsService.getGoodsCategoryPoById(id));
-                log.setStatusCode(1);
+//                log.setStatusCode(1);
             }else {
-                log.setStatusCode(0);
+//                log.setStatusCode(0);
                 retobj=ResponseUtil.updateCategoryFail();
             }
         }
-        logServiceApi.addLog(log);
+//        logServiceApi.addLog(log);
         return retobj;
     }
 
@@ -923,30 +931,30 @@ public class GoodsController {
     @PutMapping("/categories/l2/{id}")
     public Object updateGoodsCategoryPid(@PathVariable(value = "id") Integer id,@RequestBody GoodsCategoryPo goodsCategoryPo) {
         Object retobj;
-        Log log=new Log();
-        log.setActions("修改二级分类的父分类");
-        log.setType(2);
+//        Log log=new Log();
+//        log.setActions("修改二级分类的父分类");
+//        log.setType(2);
         Integer oldPid=goodsCategoryMapper.getGoodsCategoryPoById(id).getPid();
         Integer newPid=goodsCategoryPo.getPid();
         if(id<=0||oldPid<0||newPid<0||goodsCategoryPo==null||id==null){
             retobj=ResponseUtil.nullCategoryFail();
-            log.setStatusCode(0);
+//            log.setStatusCode(0);
         }else {//判断一下新的父分类是不是一级分类
             GoodsCategoryPo goodsCategoryPo1=goodsCategoryMapper.getGoodsCategoryPoById(newPid);
             if(goodsCategoryPo1.getPid()==0){//新父类是一级分类
                 if(goodsCategoryMapper.updateGoodsCategoryPid(goodsCategoryPo)==1){
                     retobj=ResponseUtil.ok(goodsService.getGoodsCategoryPoById(id));
-                    log.setStatusCode(1);
+//                    log.setStatusCode(1);
                 }else {
-                    log.setStatusCode(0);
+//                    log.setStatusCode(0);
                     retobj=ResponseUtil.updateCategoryFail();
                 }
             }else {
                 retobj=ResponseUtil.updateCategoryFail();
-                log.setStatusCode(0);
+//                log.setStatusCode(0);
             }
         }
-        logServiceApi.addLog(log);
+//        logServiceApi.addLog(log);
         return retobj;
     }
 
@@ -961,13 +969,13 @@ public class GoodsController {
     @DeleteMapping("/categories/{id}")
     public Object deleteGoodsCategory(@PathVariable(value = "id") Integer id) {
         Object retObj;
-        Log log=new Log();
-        log.setActions("删除分类");
-        log.setType(3);
+//        Log log=new Log();
+//        log.setActions("删除分类");
+//        log.setType(3);
         GoodsCategoryPo goodsCategoryPo=goodsService.getGoodsCategoryPoById(id);
         if(id<=0||goodsCategoryPo==null||id==null){
             retObj=ResponseUtil.nullCategoryFail();
-            log.setStatusCode(0);
+//            log.setStatusCode(0);
         }else {
             Integer point= goodsCategoryPo.getPid();
             if(point==0){
@@ -983,9 +991,9 @@ public class GoodsController {
                 goodsService.deleteGoodsCategory(id);
             }
             retObj=ResponseUtil.ok();
-            log.setStatusCode(1);
+//            log.setStatusCode(1);
         }
-        logServiceApi.addLog(log);
+//        logServiceApi.addLog(log);
         return retObj;
     }
 

@@ -101,6 +101,10 @@ public class ResponseUtil {
         return fail(506, "无操作权限");
     }
 
+    public static Object paramfail(){
+        return fail(580,"非法操作");
+    }
+
     public static Object illegel(){
         return fail(507,"非法操作");
     }

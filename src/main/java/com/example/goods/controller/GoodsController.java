@@ -157,7 +157,7 @@ public class GoodsController {
     }
 
     /**
-     * 根据id更新商品信息，删掉了body注解，修改错误返回
+     * 根据id更新商品信息，不能更改在二级分类下
      * @param id
      * @param goodsPo
      * @return Goods，修改后的商品信息
@@ -301,7 +301,7 @@ public class GoodsController {
     }
 
     /**
-     * 管理员添加商品下的产品，删掉了body的注解
+     * 管理员添加商品下的产品
      *goodsService.addProductByGoodsId(productVo);
      * @param id
      * @return Product
@@ -494,7 +494,7 @@ public class GoodsController {
 //        return retobj;
 //    }
     /**
-     * 用户根据品牌id查询商品,上架
+     * 用户根据品牌id查询商品,必须上架状态
      *
      * @param id
      * @return List<GoodsVo>
@@ -628,7 +628,7 @@ public class GoodsController {
 
 
     /**
-     * 创建一个品牌，删掉了body的注解
+     * 创建一个品牌
      *
      * @param brandPo
      * @return brandPo
@@ -698,7 +698,7 @@ public class GoodsController {
     }
 
     /**
-     * 修改单个品牌的信息，删掉了body注解
+     * 修改单个品牌的信息
      *
      * @param id
      * @param brandPo
@@ -728,7 +728,7 @@ public class GoodsController {
 
 
     /**
-     * 删除一个品牌，错误是系统内部错误
+     * 删除一个品牌，级联更改商品
      *
      * @parambrand
      * @return
@@ -842,7 +842,7 @@ public class GoodsController {
 
 
     /**
-     * 新建一个分类，删掉了body的注解，修改不能新建在二级分类下
+     * 新建一个分类，修改不能新建在二级分类下
      * @param goodsCategoryPo
      * @return
      */

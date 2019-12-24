@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @FeignClient(value = "footprintService")
 @Service
-//@RequestMapping("/footprintService")
 public interface FootprintServiceApi {
     /**
      * 调用footprint模块的添加足迹

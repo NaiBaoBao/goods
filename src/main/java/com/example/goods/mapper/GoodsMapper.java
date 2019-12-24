@@ -54,7 +54,7 @@ public interface GoodsMapper {
      * @param name 商品的名字
      * @return
      */
-    public List<GoodsPo> adminListGoods(@Param("goodsSn")String goodsSn,@Param("name")String name);
+    public List<GoodsPo> adminListGoods(String goodsSn,String name);
     /**
      * 新建商品，删掉了body的注解，不能建在一级分类下面，更改同理
      *

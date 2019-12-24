@@ -1,4 +1,5 @@
 package com.example.goods.domain;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,4 +19,3 @@ import java.util.List;
 public class GoodsCategory extends GoodsCategoryPo {
     private List<GoodsPo> goodsPoList;
 }
-

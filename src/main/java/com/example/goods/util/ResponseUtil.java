@@ -102,7 +102,7 @@ public class ResponseUtil {
     }
 
     public static Object paramfail(){
-        return fail(580,"非法操作");
+        return fail(580,"参数不合法");
     }
 
     public static Object illegel(){

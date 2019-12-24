@@ -1,6 +1,5 @@
 package com.example.goods.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,16 +25,13 @@ public class GoodsCategoryPo {
     /**
      * 该种类的父种类ID
      */
-    private Integer pid=0;
+    private Integer pid;
     /**
      * 二级目录的pic
      */
     private String picUrl;
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime gmtCreate;
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime gmtModified;
     private Boolean beDeleted;
 
 }
-

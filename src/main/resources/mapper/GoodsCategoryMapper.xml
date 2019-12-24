@@ -16,53 +16,58 @@
                pic_url
                from oomall_goods_category where is_deleted=0
     </select>
-    <sql id="key">
-        <trim suffixOverrides=",">
-            <if test="name!=null and name!=''">
-                name,
-            </if>
-            <if test="pid!=null and pid!=''">
-                pid,
-            </if>
-            <if test="gmtCreate!=null and gmtCreate!=''">
-                gmt_create,
-            </if>
-            <if test="gmtModified!=null and gmtModified!=''">
-                gmt_modified,
-            </if>
-            <if test="beDeleted!=null and beDeleted!=''">
-                is_deleted,
-            </if>
-            <if test="picUrl!=null and picUrl!=''">
-                pic_url
-            </if>
-        </trim>
-    </sql>
-    <sql id="values">
-        <trim suffixOverrides=",">
-            <if test="name!=null and name!=''">
-                #{name},
-            </if>
-            <if test="pid!=null and pid!=''">
-                #{pid},
-            </if>
-            <if test="gmtCreate!=null and gmtCreate!=''">
-                current_timestamp,
-            </if>
-            <if test="gmtModified!=null and gmtModified!=''">
-                current_timestamp,
-            </if>
-            <if test="beDeleted!=null and beDeleted!=''">
-                0,
-            </if>
-            <if test="picUrl!=null and picUrl!=''">
-                #{picUrl}
-            </if>
-        </trim>
-    </sql>
+<!--    <sql id="key">-->
+<!--        <trim suffixOverrides=",">-->
+<!--            <if test="name!=null and name!=''">-->
+<!--                name,-->
+<!--            </if>-->
+<!--            <if test="pid!=null and pid!=''">-->
+<!--                pid,-->
+<!--            </if>-->
+<!--            <if test="gmtCreate!=null and gmtCreate!=''">-->
+<!--                gmt_create,-->
+<!--            </if>-->
+<!--            <if test="gmtModified!=null and gmtModified!=''">-->
+<!--                gmt_modified,-->
+<!--            </if>-->
+<!--            <if test="beDeleted!=null and beDeleted!=''">-->
+<!--                is_deleted,-->
+<!--            </if>-->
+<!--            <if test="picUrl!=null and picUrl!=''">-->
+<!--                pic_url-->
+<!--            </if>-->
+<!--        </trim>-->
+<!--    </sql>-->
+<!--    <sql id="values">-->
+<!--        <trim suffixOverrides=",">-->
+<!--            <if test="name!=null and name!=''">-->
+<!--                #{name},-->
+<!--            </if>-->
+<!--            <if test="pid!=null and pid!=''">-->
+<!--                #{pid},-->
+<!--            </if>-->
+<!--            <if test="gmtCreate!=null and gmtCreate!=''">-->
+<!--                current_timestamp,-->
+<!--            </if>-->
+<!--            <if test="gmtModified!=null and gmtModified!=''">-->
+<!--                current_timestamp,-->
+<!--            </if>-->
+<!--            <if test="beDeleted!=null and beDeleted!=''">-->
+<!--                0,-->
+<!--            </if>-->
+<!--            <if test="picUrl!=null and picUrl!=''">-->
+<!--                #{picUrl}-->
+<!--            </if>-->
+<!--        </trim>-->
+<!--    </sql>-->
+<!--    <insert id="addGoodsCategory" parameterType="com.example.goods.domain.GoodsCategoryPo" useGeneratedKeys="true" keyProperty="id">-->
+<!--        insert into oomall_goods_category (<include refid="key"/>)-->
+<!--        values (<include refid="values"/>)-->
+<!--    </insert>-->
     <insert id="addGoodsCategory" parameterType="com.example.goods.domain.GoodsCategoryPo" useGeneratedKeys="true" keyProperty="id">
-        insert into oomall_goods_category (<include refid="key"/>)
-        values (<include refid="values"/>)
+      insert into oomall_goods_category
+      (name,pid,gmt_create,gmt_modified,is_deleted,pic_url)
+      values(#{name},#{pid},current_timestamp,current_timestamp,0,#{picUrl})
     </insert>
     <select id="getGoodsCategoryPoById" parameterType="integer" resultMap="GoodsCategoryPo">
         select id,
@@ -73,10 +78,12 @@
     </select>
     <update id="updateGoodsCategoryById" parameterType="com.example.goods.domain.GoodsCategoryPo">
         update oomall_goods_category
-        set name=#{name},
-            gmt_modified=current_timestamp,
-            pic_url=#{picUrl}
-            where id=#{id}
+        <trim prefix="set" suffixOverrides=",">
+            <if test="name!=null">name=#{name},</if>
+            <if test="gmtModified!=null">gmt_modified=#{gmtModified},</if>
+            <if test="picUrl!=null">pic_url=#{picUrl},</if>
+        </trim>
+        WHERE id=#{id}
     </update>
     <update id="updateGoodsCategoryPid" parameterType="com.example.goods.domain.GoodsCategoryPo" >
         update oomall_goods_category
@@ -95,7 +102,7 @@
                name,
                pid,
                pic_url
-               from oomall_goods_category where pid is 0 and is_deleted=0
+               from oomall_goods_category where pid=0 and is_deleted=0
     </select>
     <select id="listSecondLevelGoodsCategoryById" parameterType="integer" resultMap="GoodsCategoryPo">
         select id,

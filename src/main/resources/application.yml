@@ -4,10 +4,36 @@ spring:
   datasource:
     hikari:
       maximum-pool-size: 10
-    url: jdbc:mysql://localhost:3306/oomall?serverTimezone=UTC&useSSL=false&useUnicode=true&characterEncoding=UTF-8
-    username: root
-    password: 12345678
+    url: jdbc:mysql://47.52.88.176:3306/DB1_7?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone = Asia/Shanghai
+    username: user1_7
+    password: ooad7
     driver-class-name: com.mysql.cj.jdbc.Driver
+    druid:
+      #初始化时建立物理连接的个数
+      initial-size: 3
+      #最小连接池数量
+      min-idle: 2
+      #最大连接池数量
+      max-active: 5
+      #获取连接时最大等待时间
+      max-wait: 60000
+      #配置监控页面访问登录名及密码
+      stat-view-servlet:
+        enabled: true
+        # 访问路径为/druid时，跳转到StatViewServlet
+        url-pattern: /druid/*
+        # 是否能够重置数据
+        reset-enable: false
+        # 需要账号密码才能访问控制台
+        login-username: admin
+        login-password: 123456
+      filter:
+        stat:
+          #是否开启慢sql查询监控
+          log-slow-sql: true
+          #慢SQL执行时间
+          slow-sql-millis: 100
+        validation-query: select 1
   redis:
     host: 112.124.5.232
     port: 6379
@@ -36,7 +62,6 @@ eureka:
     prefer-ip-address: true
     non-secure-port: 8017
     ip-address: 112.124.5.232
-#    或者另一个我们的服务器
   client:
     serviceUrl:
       defaultZone: http://112.124.5.232:8011/eureka/

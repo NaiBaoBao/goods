@@ -271,4 +271,11 @@ public interface GoodsService {
      * @return
      */
     Product getProduct(Integer id);
+
+    /**修改二级分类的位置
+     *
+     * @param goodsCategoryPo
+     * @return
+     */
+    GoodsCategoryPo updateGoodsCategoryPid(GoodsCategoryPo goodsCategoryPo);
 }

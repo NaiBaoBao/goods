@@ -6,6 +6,7 @@ import com.example.goods.service.GoodsService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 /**
  * @author
@@ -36,7 +37,9 @@ public class GoodsServiceImpl implements GoodsService {
 
     @Override
     public int deleteBrandById(Integer id) {
-        return brandMapper.deleteBrandById(id);
+        brandMapper.deleteBrandById(id);
+         return 0;
+
     }
 
     @Override
@@ -99,33 +102,53 @@ public class GoodsServiceImpl implements GoodsService {
 
     @Override
     public BrandPo getBrandPoById(Integer id) {
+
         return brandMapper.getBrandPoById(id);
     }
 
     @Override
     public GoodsPo addGoods(GoodsPo goodsPo) {
         //不能是一级分类下的商品
-        goodsMapper.addGoods(goodsPo);
-        return goodsMapper.getGoodsById(goodsPo.getId());
+        goodsPo.setGmtCreate(LocalDateTime.now());
+        goodsPo.setGmtModified(LocalDateTime.now());
+        goodsPo.setStatusCode(0);
+        goodsPo.setBeDeleted(false);
+        if(goodsMapper.addGoods(goodsPo)==1){
+            return  goodsPo;
+        }else {
+            return null;
+        }
     }
 
     @Override
     public BrandPo addBrand(BrandPo brandPo) {
-        brandMapper.addBrand(brandPo);
-        return brandMapper.getBrandPoById(brandPo.getId());
+        if(brandMapper.addBrand(brandPo)==1){
+            return brandPo;
+        }
+        else {
+            return null;
+        }
     }
 
     @Override
     public BrandPo updateBrandById(BrandPo brandPo) {
-        brandMapper.updateBrandById(brandPo);
-        return brandMapper.getBrandPoById(brandPo.getId());
+        brandPo.setGmtModified(LocalDateTime.now());
+        if(brandMapper.updateBrandById(brandPo)==1){
+            return this.getBrandById(brandPo.getId());
+        }
+        return null;
     }
 
     @Override
     public GoodsCategoryPo addGoodsCategory(GoodsCategoryPo goodsCategoryPo) {
-        //不能是二级分类下的分类
-        goodsCategoryMapper.addGoodsCategory(goodsCategoryPo);
-        return goodsCategoryMapper.getGoodsCategoryPoById(goodsCategoryPo.getId());
+        goodsCategoryPo.setGmtCreate(LocalDateTime.now());
+        goodsCategoryPo.setGmtModified(LocalDateTime.now());
+        goodsCategoryPo.setBeDeleted(false);
+        if(goodsCategoryMapper.addGoodsCategory(goodsCategoryPo)==1){
+            return goodsCategoryPo;
+        }else {
+            return null;
+        }
     }
 
     @Override
@@ -141,8 +164,12 @@ public class GoodsServiceImpl implements GoodsService {
     @Override
     public GoodsCategoryPo updateGoodsCategoryById(GoodsCategoryPo goodsCategoryPo) {
         //不能是二级分类下的分类
-        goodsCategoryMapper.updateGoodsCategoryById(goodsCategoryPo);
-        return goodsCategoryMapper.getGoodsCategoryPoById(goodsCategoryPo.getId());
+        goodsCategoryPo.setGmtModified(LocalDateTime.now());
+        if(goodsCategoryMapper.updateGoodsCategoryById(goodsCategoryPo)==1){
+            return goodsCategoryPo;
+        }else {
+            return null;
+        }
     }
 
     @Override
@@ -163,15 +190,25 @@ public class GoodsServiceImpl implements GoodsService {
 
     @Override
     public ProductPo updateProductById(ProductPo productPo) {
-        productMapper.updateProductById(productPo);
-        return productMapper.getProductById(productPo.getId());
+        productPo.setGmtModified(LocalDateTime.now());
+        if(productMapper.updateProductById(productPo)==1){
+            return productPo;
+        }
+        else {
+            return null;
+        }
     }
 
     @Override
     public GoodsPo updateGoodsById(GoodsPo goodsPo) {
         //不能是一级分类下的商品
-        goodsMapper.updateGoodsById(goodsPo);
-        return goodsMapper.getGoodsById(goodsPo.getId());
+        goodsPo.setGmtModified(LocalDateTime.now());
+        if(goodsMapper.updateGoodsById(goodsPo)==1){
+            return this.getGoodsById(goodsPo.getId());
+        }else {
+            return null;
+        }
+
     }
 
     @Override
@@ -224,7 +261,7 @@ public class GoodsServiceImpl implements GoodsService {
     }
     @Override
     public List<GoodsPo> userGetBrandsInfoById(Integer id){
-        return goodsMapper.getBrandsInfoById(id);
+        return goodsMapper.userGetBrandsInfoById(id);
     }
     @Override
     public GoodsCategory getCategoryById(Integer id){
@@ -247,4 +284,14 @@ public class GoodsServiceImpl implements GoodsService {
     public Product getProduct(Integer id){
         return prMapper.getProduct(id);
     }
+    @Override
+    public GoodsCategoryPo updateGoodsCategoryPid(GoodsCategoryPo goodsCategoryPo){
+        goodsCategoryPo.setGmtModified(LocalDateTime.now());
+        if(goodsCategoryMapper.updateGoodsCategoryPid(goodsCategoryPo)==1){
+            return this.getGoodsCategoryPoById(goodsCategoryPo.getId());
+        }else {
+            return null;
+        }
+    }
+
 }

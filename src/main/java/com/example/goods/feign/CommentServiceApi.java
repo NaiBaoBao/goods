@@ -11,13 +11,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @FeignClient(value = "commentService")
 @Service
-//@RequestMapping("/commentService")
 public interface CommentServiceApi {
     /**
      * 调用comment模块的删除足迹
-     * @param
+     * @param id
      * @return
      */
     @DeleteMapping("/products/{id}/comments")
-    String deletecommentbyproduct(@PathVariable Integer id);
+    void deletecommentbyproduct(@PathVariable(value = "id") Integer id);
 }

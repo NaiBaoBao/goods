@@ -1,6 +1,5 @@
 package com.example.goods.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,7 +27,7 @@ public class GoodsPo {
     /**
      * 商品序列号
      */
-    private String goodsSn;
+     private String goodsSn;
     /**
      * 商品简称
      */
@@ -66,11 +65,11 @@ public class GoodsPo {
     /**
      * 商品分类ID
      */
-    private Integer goodsCategoryId=0;
+    private Integer goodsCategoryId;
     /**
      * 品牌ID
      */
-    private Integer brandId=0;
+    private Integer brandId;
     /**
      * 商品重量
      */
@@ -94,10 +93,7 @@ public class GoodsPo {
     private BigDecimal price;
 
     private Boolean beDeleted;
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime gmtCreate;
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime gmtModified;
 
 }
-

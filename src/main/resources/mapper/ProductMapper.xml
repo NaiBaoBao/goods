@@ -39,15 +39,27 @@
                safety_stock
                from oomall_product where id=#{id} and is_deleted=0
     </select>
+<!--    <update id="updateProductById" parameterType="com.example.goods.domain.ProductPo">-->
+<!--        update oomall_product-->
+<!--        set    pic_url=#{picUrl},-->
+<!--               specifications=#{specifications},-->
+<!--               goods_id=#{goodsId},-->
+<!--               price=#{price},-->
+<!--               safety_stock=#{safetyStock},-->
+<!--               gmt_modified=current_timestamp-->
+<!--               where id=#{id}-->
+<!--    </update>-->
     <update id="updateProductById" parameterType="com.example.goods.domain.ProductPo">
         update oomall_product
-        set    pic_url=#{picUrl},
-               specifications=#{specifications},
-               goods_id=#{goodsId},
-               price=#{price},
-               safety_stock=#{safetyStock},
-               gmt_modified=current_timestamp
-               where id=#{id}
+        <trim prefix="set" suffixOverrides=",">
+            <if test="goodsId!=null">goods_id=#{goodsId},</if>
+            <if test="picUrl!=null">pic_url=#{picUrl},</if>
+            <if test="specifications!=null">specifications=#{specifications},</if>
+            <if test="price!=null">price=#{price},</if>
+            <if test="safetyStock!=null">safety_stock=#{safetyStock},</if>
+            <if test="gmtModified!=null">gmt_modified=#{gmtModified},</if>
+        </trim>
+        WHERE id=#{id}
     </update>
     <update id="deleteProductsByGoodsId" parameterType="integer">
         update oomall_product

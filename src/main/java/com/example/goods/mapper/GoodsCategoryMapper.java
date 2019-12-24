@@ -73,5 +73,10 @@ public interface GoodsCategoryMapper {
      */
     public List<Integer> getSecondLevelId(Integer id);
 
+    /**修改二级分类位置
+     *
+     * @param goodsCategoryPo
+     * @return
+     */
     public int updateGoodsCategoryPid(GoodsCategoryPo goodsCategoryPo);
 }
